@@ -26,59 +26,135 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
         public static void AddPersistenceInfrastructureForApi(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<IdentityContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
-            services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),b => b.MigrationsAssembly(typeof(ApplicationContext).Assembly.FullName)));
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>{
+                    // Default Lockout settings.
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                    options.Lockout.MaxFailedAccessAttempts = 5;
+                    options.Lockout.AllowedForNewUsers = true;
+
+                    // Default Password settings.
+                    options.Password.RequireDigit = true;
+                    options.Password.RequireLowercase = true;
+                    options.Password.RequireNonAlphanumeric = true;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequiredUniqueChars = 1;
+
+                    // Default SignIn settings.
+                    options.SignIn.RequireConfirmedEmail = false;
+                    options.SignIn.RequireConfirmedPhoneNumber = false;
+
+                    // Default User settings.
+                    options.User.AllowedUserNameCharacters =
+                            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                    options.User.RequireUniqueEmail = false;
+                }).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
+            services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly(typeof(ApplicationContext).Assembly.FullName)));
             services.AddRepositories();
             #region Services
             services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<IExternalAuthService, ExternalAuthService>();
             #endregion
             services.Configure<JWTConfiguration>(configuration.GetSection("JWTConfiguration"));
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }) .AddJwtBearer(o =>
-                {
-                    o.RequireHttpsMetadata = false;
-                    o.SaveToken = false;
-                    o.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero,
-                        ValidIssuer = configuration["JWTConfiguration:Issuer"],
-                        ValidAudience = configuration["JWTConfiguration:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTConfiguration:Key"]))
-                    };
-                    o.Events = new JwtBearerEvents()
-                    {
-                        OnAuthenticationFailed = c =>
-                        {
-                            c.NoResult();
-                            c.Response.StatusCode = 500;
-                            c.Response.ContentType = "text/plain";
-                            return c.Response.WriteAsync(c.Exception.ToString());
-                        },
-                        OnChallenge = context =>
-                        {
-                            context.HandleResponse();
-                            context.Response.StatusCode = 401;
-                            context.Response.ContentType = "application/json";
-                            var result = JsonConvert.SerializeObject(new Response<string>("You are not Authorized"));
-                            return context.Response.WriteAsync(result);
-                        },
-                        OnForbidden = context =>
-                        {
-                            context.Response.StatusCode = 403;
-                            context.Response.ContentType = "application/json";
-                            var result = JsonConvert.SerializeObject(new Response<string>("You are not authorized to access this resource"));
-                            return context.Response.WriteAsync(result);
-                        },
-                    };
-                });
+            }).AddJwtBearer(o =>
+               {
+                   o.RequireHttpsMetadata = false;
+                   o.SaveToken = false;
+                   o.TokenValidationParameters = new TokenValidationParameters
+                   {
+                       ValidateIssuerSigningKey = true,
+                       ValidateIssuer = true,
+                       ValidateAudience = true,
+                       ValidateLifetime = true,
+                       ClockSkew = TimeSpan.Zero,
+                       ValidIssuer = configuration["JWTConfiguration:Issuer"],
+                       ValidAudience = configuration["JWTConfiguration:Audience"],
+                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTConfiguration:Key"]))
+                   };
+                   o.Events = new JwtBearerEvents()
+                   {
+                       OnAuthenticationFailed = c =>
+                       {
+                           c.NoResult();
+                           c.Response.StatusCode = 500;
+                           c.Response.ContentType = "text/plain";
+                           return c.Response.WriteAsync(c.Exception.ToString());
+                       },
+                       OnChallenge = context =>
+                       {
+                           context.HandleResponse();
+                           context.Response.StatusCode = 401;
+                           context.Response.ContentType = "application/json";
+                           var result = JsonConvert.SerializeObject(new Response<string>("You are not Authorized"));
+                           return context.Response.WriteAsync(result);
+                       },
+                       OnForbidden = context =>
+                       {
+                           context.Response.StatusCode = 403;
+                           context.Response.ContentType = "application/json";
+                           var result = JsonConvert.SerializeObject(new Response<string>("You are not authorized to access this resource"));
+                           return context.Response.WriteAsync(result);
+                       },
+                   };
+               });
 
+
+            /// Cookie settings
+            /// 
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                //options.Cookie.Name = "YourAppCookieName";
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                //options.LoginPath = "/Identity/Account/Login";
+                // ReturnUrlParameter requires 
+                //using Microsoft.AspNetCore.Authentication.Cookies;
+                //options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+                options.SlidingExpiration = true;
+            });
+
+            /// Cors settings
+            ///
+
+            if (configuration.GetSection("AllowedOrigins").Exists())
+            {
+                var origins = configuration.GetSection("AllowedOrigins").Value.Split(";");
+                if (origins.Length > 0)
+                {
+                    services.AddCors(options =>
+                    {
+                        options.AddDefaultPolicy(
+                            builder =>
+                            {
+                                builder.WithOrigins(origins)
+                                    .AllowAnyMethod()
+                                    .AllowAnyHeader()
+                                    .AllowCredentials();
+                            });
+                    });
+                }
+                else
+                {
+                    services.AddCors(options =>
+                    {
+                        options.AddDefaultPolicy(
+                            builder =>
+                            {
+                                builder.AllowAnyOrigin()
+                                    .AllowAnyMethod()
+                                    .AllowAnyHeader()
+                                    .AllowCredentials();
+                            });
+                    });
+                }
+
+            }
         }
     }
 }

@@ -12,7 +12,6 @@ namespace AspNetCoreHero.PublicAPI.Extensions
 {
     public static class ServiceCollectionExtension
     {
-
         public static void AddApiVersioningExtension(this IServiceCollection services)
         {
             services.AddApiVersioning(config =>
@@ -73,7 +72,6 @@ namespace AspNetCoreHero.PublicAPI.Extensions
                     },
                 });
             });
-        }
-
+        }      
     }
 }

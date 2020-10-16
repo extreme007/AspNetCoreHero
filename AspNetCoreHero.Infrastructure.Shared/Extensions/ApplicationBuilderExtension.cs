@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AspNetCoreHero.Infrastructure.Shared.Middlewares;
+using Microsoft.AspNetCore.Builder;
 
 namespace AspNetCoreHero.Infrastructure.Shared.Extensions
 {
@@ -13,6 +14,11 @@ namespace AspNetCoreHero.Infrastructure.Shared.Extensions
                 options.RoutePrefix = "swagger";
                 options.DisplayRequestDuration();
             });
+        }
+
+        public static void UseErrorHandlingMiddleware(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<ErrorHandlerMiddleware>();
         }
     }
 }

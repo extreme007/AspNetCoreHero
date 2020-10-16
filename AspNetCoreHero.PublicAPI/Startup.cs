@@ -30,7 +30,16 @@ namespace AspNetCoreHero.PublicAPI
             services.AddSharedInfrastructure(_configuration);
             services.AddApiVersioningExtension();
             services.AddSwaggerService();
-            services.AddControllers();
+            services.AddControllers()
+                  .ConfigureApiBehaviorOptions(options =>
+                  {
+                      //options.SuppressConsumesConstraintForFormFileParameters = true;
+                      //options.SuppressInferBindingSourcesForParameters = true;
+                      options.SuppressModelStateInvalidFilter = true;
+                      //options.SuppressMapClientErrors = true;
+                      //options.ClientErrorMapping[StatusCodes.Status404NotFound].Link =
+                      //    "https://httpstatuses.com/404";
+                  });
             services.AddPersistenceInfrastructureForApi(_configuration);
             services.AddHttpContextAccessor();
             //For In-Memory Caching
@@ -48,9 +57,11 @@ namespace AspNetCoreHero.PublicAPI
             }
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseSwaggerService();
+            app.UseErrorHandlingMiddleware();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
