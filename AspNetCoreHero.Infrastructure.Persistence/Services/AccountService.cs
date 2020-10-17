@@ -85,7 +85,9 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                UserName = request.UserName
+                UserName = request.UserName,
+                IsActive = true,
+                ProfilePicture = null,
             };
             var userWithSameEmail = await _userManager.FindByEmailAsync(request.Email);
             if (userWithSameEmail == null)

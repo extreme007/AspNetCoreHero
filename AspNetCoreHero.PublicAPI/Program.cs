@@ -32,7 +32,7 @@ namespace AspNetCoreHero.PublicAPI
                     await Infrastructure.Persistence.Seeds.IdentityContextSeed.SeedBasicUserAsync(userManager, roleManager);
 
                     _logger.LogInformation("Finished Seeding Default Data");
-                    //_logger.LogInformation("Application Starting");
+                    _logger.LogInformation("Application Starting");
                 }
                 catch (Exception ex)
                 {

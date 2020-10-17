@@ -57,6 +57,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
             services.AddTransient<IAccountService, AccountService>();
             #endregion
             services.Configure<JWTConfiguration>(configuration.GetSection("JWTConfiguration"));
+            services.Configure<MailConfiguration>(configuration.GetSection("MailSettings"));
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

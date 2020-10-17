@@ -34,7 +34,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmailAsync([FromQuery] string userId, [FromQuery] string code)
         {
-            var origin = Request.Headers["origin"];
+            //var origin = Request.Headers["origin"];
             return Ok(await _accountService.ConfirmEmailAsync(userId, code));
         }
         [HttpPost("forgot-password")]

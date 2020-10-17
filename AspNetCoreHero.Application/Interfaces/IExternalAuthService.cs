@@ -10,7 +10,6 @@ namespace AspNetCoreHero.Application.Interfaces
 {
     public interface IExternalAuthService
     {
-        ProviderUserDetails GetProviderUserDetails(string providerToken);
-        Task<Response<AuthenticationResponse>> ExternalAuthenticateAsync(string providerToken, string ipAddress);
+        Task<Response<AuthenticationResponse>> ExternalAuthenticateAsync(ExternalAuthRequest externalAuthRequest, string ipAddress);
     }
 }

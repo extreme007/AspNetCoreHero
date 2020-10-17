@@ -33,32 +33,70 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
         }
-        public async Task<Response<AuthenticationResponse>> ExternalAuthenticateAsync(string providerToken, string ipAddress)
+        public async Task<Response<AuthenticationResponse>> ExternalAuthenticateAsync(ExternalAuthRequest externalAuthRequest, string ipAddress)
         {
-            var ProviderUserDetails = GetProviderUserDetails(providerToken);
-            if (ProviderUserDetails == null)
-                throw new ApiException($"Invalid Credentials");
-            var user = await _userManager.FindByEmailAsync(ProviderUserDetails.Email);
-            if (user == null)
+            ApplicationUser user = null;
+            if(externalAuthRequest.Type == "google")
             {
-                user = new ApplicationUser
-                {
-                    Email = ProviderUserDetails.Email,
-                    FirstName = ProviderUserDetails.FirstName,
-                    LastName = ProviderUserDetails.LastName,
-                    UserName = ProviderUserDetails.ProviderUserId,
-                    EmailConfirmed = true
-                };
-                var result = await _userManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
-                }
-                else
-                {
+                var GoogleApiTokenInfo = GetGoogleApiTokenInfo(externalAuthRequest);
+                if (GoogleApiTokenInfo == null)
                     throw new ApiException($"Invalid Credentials");
+                user = await _userManager.FindByEmailAsync(GoogleApiTokenInfo.email);
+                if (user == null)
+                {
+
+                    user = new ApplicationUser
+                    {
+                        Email = GoogleApiTokenInfo.email,
+                        FirstName = GoogleApiTokenInfo.given_name,
+                        LastName = GoogleApiTokenInfo.family_name,
+                        UserName = GoogleApiTokenInfo.sub,
+                        EmailConfirmed = true,
+                        ProfilePicture = null,
+                        IsActive = true
+                    };
+                    var result = await _userManager.CreateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
+                    }
+                    else
+                    {
+                        throw new ApiException($"Invalid Credentials");
+                    }
                 }
             }
+            else if(externalAuthRequest.Type == "facebook")
+            {
+                var FacebookApiTokenInfo = GetFacebookApiTokenInfo(externalAuthRequest);
+                if (FacebookApiTokenInfo == null)
+                    throw new ApiException($"Invalid Credentials");
+                user = await _userManager.FindByEmailAsync(FacebookApiTokenInfo.email);
+                if (user == null)
+                {
+
+                    user = new ApplicationUser
+                    {
+                        Email = FacebookApiTokenInfo.email,
+                        FirstName = FacebookApiTokenInfo.first_name,
+                        LastName = FacebookApiTokenInfo.last_name,
+                        UserName = FacebookApiTokenInfo.id,
+                        EmailConfirmed = true,
+                        ProfilePicture = null,
+                        IsActive = true
+                    };
+                    var result = await _userManager.CreateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
+                    }
+                    else
+                    {
+                        throw new ApiException($"Invalid Credentials");
+                    }
+                }
+            }
+            
 
             JwtSecurityToken jwtSecurityToken = await TokenHelper.GenerateJWToken(user, _userManager, _jwtSettings);
             AuthenticationResponse response = new AuthenticationResponse();
@@ -74,11 +112,12 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             return new Response<AuthenticationResponse>(response, $"Authenticated {user.UserName}");
         }
 
-        public ProviderUserDetails GetProviderUserDetails(string providerToken)
+        private GoogleApiTokenInfo GetGoogleApiTokenInfo(ExternalAuthRequest externalAuthRequest)
         {
+            const string url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token={0}";
             var httpClient = new HttpClient();
 
-            var requestUri = new Uri(string.Format("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token={0}", providerToken));
+            var requestUri = new Uri(string.Format(url, externalAuthRequest.Token));
 
             HttpResponseMessage httpResponseMessage;
             try
@@ -98,16 +137,35 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             var response = httpResponseMessage.Content.ReadAsStringAsync().Result;
             var googleApiTokenInfo = JsonConvert.DeserializeObject<GoogleApiTokenInfo>(response);
 
-            var ProviderUserDetails = new ProviderUserDetails
+            return googleApiTokenInfo;
+        }
+
+        private FacebookApiTokenInfo GetFacebookApiTokenInfo(ExternalAuthRequest externalAuthRequest)
+        {
+            const string url = "https://graph.facebook.com/{0}?access_token={1}&fields={2}";
+            var httpClient = new HttpClient();
+
+            var requestUri = new Uri(string.Format(url, externalAuthRequest.UserId, externalAuthRequest.Token, "first_name,last_name,locale,gender,name,email"));
+
+            HttpResponseMessage httpResponseMessage;
+            try
             {
-                Email = googleApiTokenInfo.email,
-                FirstName = googleApiTokenInfo.given_name,
-                LastName = googleApiTokenInfo.family_name,
-                Locale = googleApiTokenInfo.locale,
-                Name = googleApiTokenInfo.name,
-                ProviderUserId = googleApiTokenInfo.sub
-            };
-            return ProviderUserDetails;
+                httpResponseMessage = httpClient.GetAsync(requestUri).Result;
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException(ex.Message);
+            }
+
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+            {
+                return null;
+            }
+
+            var response = httpResponseMessage.Content.ReadAsStringAsync().Result;
+            var facebookApiTokenInfo = JsonConvert.DeserializeObject<FacebookApiTokenInfo>(response);
+
+            return facebookApiTokenInfo;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetCoreHero.Application.DTOs.ExternalAuth;
 using AspNetCoreHero.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +19,15 @@ namespace AspNetCoreHero.PublicAPI.Controllers
             _externalAuthService = externalAuthService;
         }
 
-        [HttpGet("Google")]
-        public async Task<IActionResult> GoogleAuthAsync()
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] ExternalAuthRequest externalAuthRequest)
         {
-            string BearerToken = Request.Headers["Authorization"].ToString();
-            if (string.IsNullOrEmpty(BearerToken))
-                return Ok(false);
-            var tokenArray = BearerToken.Split(" ").ToArray();
-            var token = tokenArray[1];
-            return Ok(await _externalAuthService.ExternalAuthenticateAsync(token, GenerateIPAddress()));
+            //string BearerToken = Request.Headers["Authorization"].ToString();
+            //if (string.IsNullOrEmpty(BearerToken))
+            //    return Ok(false);
+            //var tokenArray = BearerToken.Split(" ").ToArray();
+            //var token = tokenArray[1];
+            return Ok(await _externalAuthService.ExternalAuthenticateAsync(externalAuthRequest, GenerateIPAddress()));
         }
 
         private string GenerateIPAddress()
