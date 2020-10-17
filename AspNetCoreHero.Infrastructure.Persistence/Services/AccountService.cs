@@ -29,15 +29,18 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly JWTConfiguration _jwtSettings;
         private readonly IMailService _mailService;
+        private readonly MailConfiguration _mailSettings;
         public AccountService(UserManager<ApplicationUser> userManager,
             IOptions<JWTConfiguration> jwtSettings,
             SignInManager<ApplicationUser> signInManager,
-            IMailService mailService)
+            IMailService mailService,
+            IOptions<MailConfiguration> mailSettings)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
             _signInManager = signInManager;
             _mailService = mailService;
+            _mailSettings = mailSettings.Value;
         }
 
         public async Task<Response<AuthenticationResponse>> AuthenticateAsync(AuthenticationRequest request, string ipAddress)
@@ -93,7 +96,12 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
                     await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
                     var verificationUri = await SendVerificationEmail(user, origin);
                     //TODO: Attach Email Service here and configure it via appsettings
-                    await _mailService.SendAsync(new MailRequest() { From = "mail@codewithmukesh.com", To = user.Email, Body = $"Please confirm your account by visiting this URL {verificationUri}", Subject = "Confirm Registration" });
+                    await _mailService.SendAsync(new MailRequest() { 
+                        From = _mailSettings.From,
+                        To = user.Email,
+                        Body = $"Please confirm your account by visiting this URL {verificationUri}",
+                        Subject = "Confirm Registration" 
+                    });
                     return new Response<string>(user.Id, message: $"User Registered. Please confirm your account by visiting this URL {verificationUri}");
                 }
                 else
@@ -119,6 +127,18 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             return verificationUri;
         }
 
+        private async Task<string> SendResetPasswordEmail(ApplicationUser user, string origin)
+        {
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var route = "api/account/reset-password";
+            var _enpointUri = new Uri(string.Concat($"{origin}/", route));
+            var resetPasswordUri = QueryHelpers.AddQueryString(_enpointUri.ToString(), "email", user.Email);
+            resetPasswordUri = QueryHelpers.AddQueryString(resetPasswordUri, "token", code);
+            //Email Service Call Here
+            return resetPasswordUri;
+        }
+
         public async Task<Response<string>> ConfirmEmailAsync(string userId, string code)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -141,12 +161,15 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             // always return ok response to prevent email enumeration
             if (account == null) return;
 
-            var code = await _userManager.GeneratePasswordResetTokenAsync(account);
-            var route = "api/account/reset-password/";
-            var _enpointUri = new Uri(string.Concat($"{origin}/", route));
+            //var code = await _userManager.GeneratePasswordResetTokenAsync(account);
+            //var route = "api/account/reset-password/";
+            //var _enpointUri = new Uri(string.Concat($"{origin}/", route));
+
+            var resetPasswordUri = await SendResetPasswordEmail(account, origin);
+
             var emailRequest = new MailRequest()
             {
-                Body = $"You reset token is - {code}",
+                Body = $"Please ResetPasswrod your account by visiting this URL - {resetPasswordUri}",
                 To = model.Email,
                 Subject = "Reset Password",
             };

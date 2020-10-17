@@ -7,6 +7,7 @@ using AspNetCoreHero.Application.Interfaces;
 using AspNetCoreHero.Application.Wrappers;
 using AspNetCoreHero.Infrastructure.Persistence.Helpers;
 using AspNetCoreHero.Infrastructure.Persistence.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -24,20 +25,14 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
     public class ExternalAuthService : IExternalAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly JWTConfiguration _jwtSettings;
 
         public ExternalAuthService(UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager,
-        SignInManager<ApplicationUser> signInManager,
         IOptions<JWTConfiguration> jwtSettings)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _jwtSettings = jwtSettings.Value;
         }
-
         public async Task<Response<AuthenticationResponse>> ExternalAuthenticateAsync(string providerToken, string ipAddress)
         {
             var ProviderUserDetails = GetProviderUserDetails(providerToken);
@@ -65,7 +60,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
                 }
             }
 
-            JwtSecurityToken jwtSecurityToken = await TokenHelper.GenerateJWToken(user,_userManager,_jwtSettings);
+            JwtSecurityToken jwtSecurityToken = await TokenHelper.GenerateJWToken(user, _userManager, _jwtSettings);
             AuthenticationResponse response = new AuthenticationResponse();
             response.Id = user.Id;
             response.JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
