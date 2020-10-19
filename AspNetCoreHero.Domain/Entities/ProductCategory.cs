@@ -8,6 +8,7 @@ namespace AspNetCoreHero.Domain.Entities
     public class ProductCategory : AuditableEntityBase
     {
         public string Name { get; set; }
+        public string Description { get; set; }
         public decimal Tax { get; set; }
     }
 }

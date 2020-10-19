@@ -11,12 +11,13 @@ using System.Threading.Tasks;
 
 namespace AspNetCoreHero.Application.Features.ProductCategories.Commands.Create
 {
-    public partial class CreateProductCategoryCommand : IRequest<Response<int>>
+    public partial class CreateProductCategoryCommand : IRequest<Response<ProductCategory>>
     {
         public string Name { get; set; }
         public decimal Tax { get; set; }
+        public string Description { get; set; }
     }
-    public class CreateProductCategoryCommandHandler : IRequestHandler<CreateProductCategoryCommand, Response<int>>
+    public class CreateProductCategoryCommandHandler : IRequestHandler<CreateProductCategoryCommand, Response<ProductCategory>>
     {
         private readonly IProductCategoryRepositoryAsync _productCategoryRepository;
         private readonly IMapper _mapper;
@@ -29,11 +30,14 @@ namespace AspNetCoreHero.Application.Features.ProductCategories.Commands.Create
             _mapper = mapper;
         }
 
-        public async Task<Response<int>> Handle(CreateProductCategoryCommand request, CancellationToken cancellationToken)
+        public async Task<Response<ProductCategory>> Handle(CreateProductCategoryCommand request, CancellationToken cancellationToken)
         {
             var category = _mapper.Map<ProductCategory>(request);
             await _productCategoryRepository.AddAsync(category);
-            return new Response<int>(await _unitOfWork.Commit(cancellationToken));
+            var result = await _unitOfWork.Commit(cancellationToken);
+            if (result > 0)
+                return new Response<ProductCategory>(category);
+            return new Response<ProductCategory>(null);
         }
     }
 }
