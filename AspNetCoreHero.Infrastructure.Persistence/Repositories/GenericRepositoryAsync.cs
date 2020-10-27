@@ -70,5 +70,10 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             }
             return cachedList;
         }
+
+        public async Task<int> CountAsync()
+        {
+            return await _dbContext.Set<T>().CountAsync();
+        }
     }
 }

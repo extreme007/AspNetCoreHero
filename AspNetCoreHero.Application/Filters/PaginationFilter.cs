@@ -4,19 +4,19 @@ using System.Text;
 
 namespace AspNetCoreHero.Application.Filters
 {
-    public class RequestParameter
+    public class PaginationFilter
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
-        public RequestParameter()
+        public PaginationFilter()
         {
             this.PageNumber = 1;
             this.PageSize = 10;
         }
-        public RequestParameter(int pageNumber, int pageSize)
+        public PaginationFilter(int pageNumber, int pageSize, int totalRecord = 0)
         {
             this.PageNumber = pageNumber < 1 ? 1 : pageNumber;
-            this.PageSize = pageSize > 10 ? 10 : pageSize;
+            this.PageSize = pageSize < 1 ? totalRecord : pageSize;
         }
     }
 }

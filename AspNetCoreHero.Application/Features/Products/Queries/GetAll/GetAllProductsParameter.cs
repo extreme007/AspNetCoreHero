@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AspNetCoreHero.Application.Features.Products.Queries.GetAll
 {
-    public class GetAllProductsParameter : RequestParameter
+    public class GetAllProductsParameter : PaginationFilter
     {
         public bool ReturnImages { get; set; } = false;
     }
