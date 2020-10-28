@@ -58,6 +58,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
             #endregion
             services.Configure<JWTConfiguration>(configuration.GetSection("JWTConfiguration"));
             services.Configure<MailConfiguration>(configuration.GetSection("MailSettings"));
+            services.Configure<PaginationConfiguration>(configuration.GetSection("PaginationConfiguration"));
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

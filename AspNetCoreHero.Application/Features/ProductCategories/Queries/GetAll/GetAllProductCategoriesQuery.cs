@@ -1,10 +1,12 @@
-﻿using AspNetCoreHero.Application.Filters;
+﻿using AspNetCoreHero.Application.Configurations;
+using AspNetCoreHero.Application.Filters;
 using AspNetCoreHero.Application.Helpers;
 using AspNetCoreHero.Application.Interfaces.Repositories;
 using AspNetCoreHero.Application.Wrappers;
 using AspNetCoreHero.Domain.Entities;
 using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,16 +25,20 @@ namespace AspNetCoreHero.Application.Features.ProductCategories.Queries.GetAll
     {
         private readonly IProductCategoryRepositoryAsync _productCategoryRepository;
         private readonly IMapper _mapper;
-        public GetAllProductsQueryHandler(IProductCategoryRepositoryAsync productCategoryRepository, IMapper mapper)
+        private readonly PaginationConfiguration _paginationConfiguration;
+
+        public GetAllProductsQueryHandler(IProductCategoryRepositoryAsync productCategoryRepository, IMapper mapper,IOptions<PaginationConfiguration> paginationConfiguration)
         {
             _productCategoryRepository = productCategoryRepository;
             _mapper = mapper;
+            _paginationConfiguration = paginationConfiguration.Value;
         }
 
         public async Task<PagedResponse<IEnumerable<GetAllProductCategoryViewModel>>> Handle(GetAllProductCategoriesQuery request, CancellationToken cancellationToken)
         {
             int totalRecords = await _productCategoryRepository.CountAsync();
-            var validFilter = new PaginationFilter(request.PageNumber, request.PageSize, totalRecords);
+            var pageSize = request.PageSize == 0 ? _paginationConfiguration.PageSize : request.PageSize;
+            var validFilter = new PaginationFilter(request.PageNumber, pageSize, totalRecords);
             var categories = await _productCategoryRepository.GetPagedReponseAsync(validFilter.PageNumber, validFilter.PageSize);
             var categoriesViewModel = _mapper.Map<IEnumerable<GetAllProductCategoryViewModel>>(categories);
 
