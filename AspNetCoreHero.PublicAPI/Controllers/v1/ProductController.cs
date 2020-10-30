@@ -27,7 +27,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers.v1
         public async Task<IActionResult> Get(int id)
         {
             var product = await Mediator.Send(new GetProductByIdQuery { Id = id });
-            product.Data.Image = null;
+            //product.Data.Image = null;
             return Ok(product);
         }
 
