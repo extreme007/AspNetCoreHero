@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
@@ -16,11 +17,13 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
         private readonly string cacheKey = $"{typeof(T)}";
         private readonly ApplicationContext _dbContext;
         private readonly Func<CacheTech, ICacheService> _cacheService;
+        private DbSet<T> dbSet;
 
         public GenericRepositoryAsync(ApplicationContext dbContext, Func<CacheTech, ICacheService> cacheService)
         {
             _dbContext = dbContext;
             _cacheService = cacheService;
+            dbSet = _dbContext.Set<T>();
         }
 
         public virtual async Task<T> GetByIdAsync(int id)
@@ -28,19 +31,27 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             return await _dbContext.Set<T>().FindAsync(id);
         }
 
-        public async Task<IReadOnlyList<T>> GetPagedReponseAsync(int pageNumber, int pageSize)
+        public async Task<IReadOnlyList<T>> GetPagedReponseAsync(int pageNumber, int pageSize, string includeProperties = "")
         {
-            return await _dbContext
-                .Set<T>()
+            var queryable = dbSet
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .AsNoTracking()
-                .ToListAsync();
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (string IncludeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    queryable = queryable.Include(IncludeProperty);
+                }
+            }
+            return await queryable.ToListAsync();
         }
 
         public async Task<T> AddAsync(T entity)
         {
-            await _dbContext.Set<T>().AddAsync(entity);
+            await dbSet.AddAsync(entity);
             _cacheService(cacheTech).Remove(cacheKey);
             return entity;
         }
@@ -54,7 +65,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
 
         public Task DeleteAsync(T entity)
         {
-            _dbContext.Set<T>().Remove(entity);
+            dbSet.Remove(entity);
             _cacheService(cacheTech).Remove(cacheKey);
             return Task.CompletedTask;
         }
@@ -73,7 +84,31 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
 
         public async Task<int> CountAsync()
         {
-            return await _dbContext.Set<T>().CountAsync();
+            return await dbSet.CountAsync();
+        }
+
+        public IQueryable<T> Query(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = "")
+        {
+            IQueryable<T> Query = dbSet;
+
+            if (filter != null)
+            {
+                Query = Query.Where(filter);
+            }
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (string IncludeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    Query = Query.Include(IncludeProperty);
+                }
+            }
+
+            if (orderBy != null)
+            {
+                return orderBy(Query);
+            }
+            return Query.AsQueryable();
         }
     }
 }

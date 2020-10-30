@@ -11,8 +11,9 @@ namespace AspNetCoreHero.Application.Features.Products.Queries.GetAll
         public string Name { get; set; }
         public string Barcode { get; set; }
         public string Description { get; set; }
-        public byte[] Image { get; set; }
-        public decimal Rate { get; set; }
+        public string Image { get; set; }
+        public decimal Price { get; set; }
+        public int ProductCategoryId { get; set; }
         public GetAllProductCategoryViewModel ProductCategory { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             foreach (var entry in ChangeTracker.Entries<AuditableEntityBase>().ToList())
-            {
+            {               
                 var entityType = entry.Entity.GetType().Name;
                 switch (entry.State)
                 {
@@ -65,6 +65,24 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 Entity = entityType,
                                 EntityId = entry.Entity.Id.ToString()
                             }) ;
+                        }
+                        catch { }
+                        break;
+                    case EntityState.Deleted:
+                        entry.Entity.DeletionTime = _dateTime.Now;
+                        entry.Entity.DeletedBy = _authenticatedUser.UserId;
+                        entry.Entity.IsDeleted = true;
+                        try
+                        {
+                            await ActivityLogs.AddAsync(new ActivityLog
+                            {
+                                Action = "Deleted",
+                                DateTime = _dateTime.Now,
+                                UserId = _authenticatedUser.UserId,
+                                UserName = _authenticatedUser.Username,
+                                Entity = entityType,
+                                EntityId = entry.Entity.Id.ToString()
+                            });
                         }
                         catch { }
                         break;

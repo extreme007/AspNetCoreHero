@@ -24,22 +24,27 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             _cacheService = cacheService;
         }
 
-        public async Task<IReadOnlyList<Product>> GetAllWithCategoriesAsync(bool isCached = false)
+        public async Task<IReadOnlyList<Product>> GetAllWithCategoriesAsync(int pageNumber, int pageSize, bool isCached = false)
         {
             if (!_cacheService(cacheTech).TryGet(cacheKey, out IReadOnlyList<Product> cachedList))
             {
-                cachedList = await _products.Include(a => a.ProductCategory).ToListAsync();
+                var data = _products.Include(a => a.ProductCategory).AsQueryable();
+                cachedList = await data.Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking().ToListAsync();
                 _cacheService(cacheTech).Set(cacheKey, cachedList);
             }
             return cachedList;
         }
 
-        public async Task<IReadOnlyList<Product>> GetAllWithCategoriesWithoutImagesAsync(bool isCached = false)
+        public async Task<IReadOnlyList<Product>> GetAllWithCategoriesWithoutImagesAsync(int pageNumber, int pageSize, bool isCached = false)
         {
-            if (!_cacheService(cacheTech).TryGet($"{cacheKey}WithoutImages", out IReadOnlyList<Product> cachedList))
+            if (!_cacheService(cacheTech).TryGet($"{cacheKey}WithoutImages{pageNumber}{pageSize}", out IReadOnlyList<Product> cachedList))
             {
                 var data = _products.Include(a => a.ProductCategory).AsQueryable();
-                cachedList = await data.Select(a =>
+                cachedList = await data.Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking().Select(a =>
                 new Product
                 {
                     Id = a.Id,
@@ -47,10 +52,10 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
                     Name = a.Name,
                     ProductCategory = a.ProductCategory,
                     ProductCategoryId = a.ProductCategoryId,
-                    Rate = a.Rate,
+                    Price = a.Price,
                     Barcode = a.Barcode
                 }).ToListAsync();
-                _cacheService(cacheTech).Set($"{cacheKey}WithoutImages", cachedList);
+                _cacheService(cacheTech).Set($"{cacheKey}WithoutImages{pageNumber}{pageSize}", cachedList);
             }
             return cachedList;
         }

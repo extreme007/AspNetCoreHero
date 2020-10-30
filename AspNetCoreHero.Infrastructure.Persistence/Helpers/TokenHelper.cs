@@ -72,5 +72,15 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Helpers
             // convert random bytes to hex string
             return BitConverter.ToString(randomBytes).Replace("-", "");
         }
+
+        private static string RandomToken(int size = 32)
+        {
+            var randomNumber = new byte[size];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
     }
 }

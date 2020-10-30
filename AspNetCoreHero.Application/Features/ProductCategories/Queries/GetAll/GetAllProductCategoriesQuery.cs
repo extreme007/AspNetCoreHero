@@ -37,12 +37,12 @@ namespace AspNetCoreHero.Application.Features.ProductCategories.Queries.GetAll
         public async Task<PagedResponse<IEnumerable<GetAllProductCategoryViewModel>>> Handle(GetAllProductCategoriesQuery request, CancellationToken cancellationToken)
         {
             int totalRecords = await _productCategoryRepository.CountAsync();
-            var pageSize = request.PageSize == 0 ? _paginationConfiguration.PageSize : request.PageSize;
-            var validFilter = new PaginationFilter(request.PageNumber, pageSize, totalRecords);
+            var pageSize = request.PageSize < 1 ? _paginationConfiguration.PageSize : request.PageSize;
+            var validFilter = new PaginationFilter(request.PageNumber, pageSize);
             var categories = await _productCategoryRepository.GetPagedReponseAsync(validFilter.PageNumber, validFilter.PageSize);
             var categoriesViewModel = _mapper.Map<IEnumerable<GetAllProductCategoryViewModel>>(categories);
 
-            var result = PaginationHelper.CreatePagedReponse<GetAllProductCategoryViewModel>(categoriesViewModel, validFilter, totalRecords);
+            var result = PaginationHelper.CreatePagedReponse<GetAllProductCategoryViewModel>(categoriesViewModel, validFilter,totalRecords);
             return result;
         }
     }

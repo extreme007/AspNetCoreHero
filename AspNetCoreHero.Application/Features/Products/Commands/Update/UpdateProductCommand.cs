@@ -15,8 +15,8 @@ namespace AspNetCoreHero.Application.Features.Products.Commands.Update
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public byte[] Image { get; set; }
-        public decimal Rate { get; set; }
+        public string Image { get; set; }
+        public decimal Price { get; set; }
         public int ProductCategoryId { get; set; }
         public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Response<int>>
         {
@@ -38,7 +38,7 @@ namespace AspNetCoreHero.Application.Features.Products.Commands.Update
                 else
                 {
                     product.Name = command.Name;
-                    product.Rate = command.Rate;
+                    product.Price = command.Price;
                     product.Description = command.Description;
                     product.Image = command.Image;
                     product.ProductCategoryId = command.ProductCategoryId;
