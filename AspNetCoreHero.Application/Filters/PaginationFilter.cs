@@ -10,8 +10,8 @@ namespace AspNetCoreHero.Application.Filters
         public int PageSize { get; set; }
         public PaginationFilter()
         {
-            this.PageNumber = 1;
-            this.PageSize = int.MaxValue;
+            //this.PageNumber = 1;
+            //this.PageSize = int.MaxValue;
         }
         public PaginationFilter(int pageNumber, int pageSize)
         {
