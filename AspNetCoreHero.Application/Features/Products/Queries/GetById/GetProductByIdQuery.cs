@@ -17,14 +17,18 @@ namespace AspNetCoreHero.Application.Features.Products.Queries.GetById
         public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, Response<Product>>
         {
             private readonly IProductRepositoryAsync _productRepository;
-            public GetProductByIdQueryHandler(IProductRepositoryAsync productRepository)
+            private readonly IProductCategoryRepositoryAsync _productCategoryRepository;
+            public GetProductByIdQueryHandler(IProductRepositoryAsync productRepository, IProductCategoryRepositoryAsync productCategoryRepository)
             {
                 _productRepository = productRepository;
+                _productCategoryRepository = productCategoryRepository;
             }
             public async Task<Response<Product>> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
             {
                 var product = await _productRepository.GetByIdAsync(query.Id);
+                
                 if (product == null) throw new NotFoundException<Product>(query.Id);
+                product.ProductCategory = await _productCategoryRepository.GetByIdAsync(product.ProductCategoryId);
                 return new Response<Product>(product);
             }
         }
