@@ -16,6 +16,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers.v1
     public class ProductCategoryController : BaseApiController
     {
         [HttpGet]
+        [Authorize(Roles ="Basic")]
         public async Task<IActionResult> Get([FromQuery] GetAllProductCategoriesQuery filter)
         {           
             return Ok(await Mediator.Send(new GetAllProductCategoriesQuery() { PageSize = filter.PageSize, PageNumber = filter.PageNumber }));

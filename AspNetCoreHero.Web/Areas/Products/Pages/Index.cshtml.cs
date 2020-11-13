@@ -92,7 +92,7 @@ namespace AspNetCoreHero.Web.Areas.Products.Pages
                         if (product.Image == null)
                         {
                             var oldProduct = await Mediator.Send(new GetProductByIdQuery { Id = id });
-                            product.Image = oldProduct.Data.Image;
+                            //product.Image = oldProduct.Data.Image;
                         }
                         var updateProductCommand = Mapper.Map<UpdateProductCommand>(product);
 
