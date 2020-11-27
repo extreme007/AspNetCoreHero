@@ -21,7 +21,9 @@
     <ProjectReference Include="..\AspNetCoreHero.Infrastructure.Shared\AspNetCoreHero.Infrastructure.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Resources\Images\" />
+	<Content Include="Resources\Images\**">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
 
