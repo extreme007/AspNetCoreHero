@@ -5,16 +5,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AspNetCoreHero.PublicAPI.Controllers.v1
+namespace AspNetCoreHero.PublicAPI.Controllers
 {
-    [Authorize]
-    public class TestController : BaseApiController
+    [Route("api/[controller]")]
+    public class PingController : ControllerBase
     {
         [HttpGet]
-        [Authorize(Roles = "Basic")]
         public IActionResult Get()
         {
-            return Ok(new string[] { "value 1", "value 2"});
+            return Ok("pong");
         }
     }
 }
