@@ -12,8 +12,9 @@ namespace AspNetCoreHero.Application.DTOs.Account
         public string Email { get; set; }
         public List<string> Roles { get; set; }
         public bool IsVerified { get; set; }
-        public string JWToken { get; set; }
+        public string AccessToken { get; set; }
         [JsonIgnore]
         public string RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiration { get; set; }
     }
 }

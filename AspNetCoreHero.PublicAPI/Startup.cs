@@ -58,6 +58,7 @@ namespace AspNetCoreHero.PublicAPI
             }
             app.UseHttpsRedirection();
             app.UseRouting();
+            //app.UseCookiePolicy();
             app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();

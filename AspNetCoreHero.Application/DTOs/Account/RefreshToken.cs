@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace AspNetCoreHero.Application.DTOs.Account
 {
+    [Owned]
     public class RefreshToken
     {
         public int Id { get; set; }

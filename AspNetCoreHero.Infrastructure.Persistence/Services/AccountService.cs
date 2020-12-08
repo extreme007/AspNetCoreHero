@@ -62,14 +62,30 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             JwtSecurityToken jwtSecurityToken = await TokenHelper.GenerateJWToken(user,_userManager,_jwtSettings);
             AuthenticationResponse response = new AuthenticationResponse();
             response.Id = user.Id;
-            response.JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            response.AccessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             response.Email = user.Email;
             response.UserName = user.UserName;
             var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
             response.Roles = rolesList.ToList();
             response.IsVerified = user.EmailConfirmed;
-            var refreshToken = TokenHelper.GenerateRefreshToken(ipAddress);
-            response.RefreshToken = refreshToken.Token;
+
+            if (user.RefreshTokens.Any(a => a.IsActive))
+            {
+                var activeRefreshToken = user.RefreshTokens.Where(a => a.IsActive == true).FirstOrDefault();
+                response.RefreshToken = activeRefreshToken.Token;
+                response.RefreshTokenExpiration = activeRefreshToken.Expires;
+            }
+            else
+            {
+                var refreshTokenRandom = TokenHelper.GenerateRefreshToken(ipAddress);
+                response.RefreshToken = refreshTokenRandom.Token;
+                response.RefreshTokenExpiration = refreshTokenRandom.Expires;
+                user.RefreshTokens.Add(refreshTokenRandom);
+                await _userManager.UpdateAsync(user);
+            }
+
+            //var refreshToken = TokenHelper.GenerateRefreshToken(ipAddress);
+            //response.RefreshToken = refreshToken.Token;
             return new Response<AuthenticationResponse>(response, $"Authenticated {user.UserName}");
         }
 
@@ -191,6 +207,69 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             {
                 throw new ApiException($"Error occured while reseting the password.");
             }
+        }
+
+        public async Task<Response<AuthenticationResponse>> RefreshTokenAsync(string accessToken, string ipAddress)
+        {
+            var response = new AuthenticationResponse();
+            var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == accessToken));
+            if (user == null)
+            {
+                throw new ApiException($"Token did not match any users.");
+            }
+
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == accessToken);
+
+            if (!refreshToken.IsActive)
+            {
+                throw new ApiException($"Token Not Active.");
+            }
+
+            //Revoke Current Refresh Token
+            refreshToken.Revoked = DateTime.UtcNow;
+
+            //Generate new Refresh Token and save to Database
+            var newRefreshToken = TokenHelper.GenerateRefreshToken(ipAddress);
+            user.RefreshTokens.Add(newRefreshToken);
+            await _userManager.UpdateAsync(user);
+
+            //Generates new jwt
+
+            JwtSecurityToken jwtSecurityToken = await TokenHelper.GenerateJWToken(user, _userManager, _jwtSettings);
+            response.Id = user.Id;
+            response.AccessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            response.Email = user.Email;
+            response.UserName = user.UserName;
+            var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
+            response.Roles = rolesList.ToList();
+            response.IsVerified = user.EmailConfirmed;
+            response.RefreshToken = newRefreshToken.Token;
+            response.RefreshTokenExpiration = newRefreshToken.Expires;
+            return new Response<AuthenticationResponse>(response);         
+        }
+
+        public async Task<bool> RevokeToken(string accessToken)
+        {
+            var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == accessToken));
+
+            // return false if no user found with token
+            if (user == null) return false;
+
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == accessToken);
+
+            // return false if token is not active
+            if (!refreshToken.IsActive) return false;
+
+            // revoke token and save
+            refreshToken.Revoked = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
+            return true;
+        }
+
+        public async Task<Response<List<RefreshToken>>> GetRefreshTokenList(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            return new Response<List<RefreshToken>>(user?.RefreshTokens);
         }
     }
 }

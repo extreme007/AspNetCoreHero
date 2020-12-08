@@ -14,5 +14,11 @@ namespace AspNetCoreHero.Application.Interfaces
         Task<Response<string>> ConfirmEmailAsync(string userId, string code);
         Task ForgotPassword(ForgotPasswordRequest model, string origin);
         Task<Response<string>> ResetPassword(ResetPasswordRequest model);
+
+        Task<Response<AuthenticationResponse>> RefreshTokenAsync(string accessToken,string ipAddress);
+
+        Task<bool> RevokeToken(string accessToken);
+
+        Task<Response<List<RefreshToken>>> GetRefreshTokenList(string id);
     }
 }

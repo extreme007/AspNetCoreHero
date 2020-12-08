@@ -101,7 +101,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             JwtSecurityToken jwtSecurityToken = await TokenHelper.GenerateJWToken(user, _userManager, _jwtSettings);
             AuthenticationResponse response = new AuthenticationResponse();
             response.Id = user.Id;
-            response.JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            response.AccessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             response.Email = user.Email;
             response.UserName = user.UserName;
             var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);

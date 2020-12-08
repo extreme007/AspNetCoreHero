@@ -53,7 +53,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Helpers
             return jwtSecurityToken;
         }
 
-        public static RefreshToken GenerateRefreshToken(string ipAddress)
+        public static RefreshToken GenerateRefreshToken(string ipAddress = null)
         {
             return new RefreshToken
             {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AspNetCoreHero.Application.DTOs.Account;
 using AspNetCoreHero.Application.Interfaces;
+using AspNetCoreHero.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,9 @@ namespace AspNetCoreHero.PublicAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
         {
-            return Ok(await _accountService.AuthenticateAsync(request, GenerateIPAddress()));
+            var result = await _accountService.AuthenticateAsync(request, GenerateIPAddress());
+            SetRefreshTokenInCookie(result.Data.RefreshToken);
+            return Ok(result);
         }
 
         [HttpPost("register")]
@@ -54,6 +57,52 @@ namespace AspNetCoreHero.PublicAPI.Controllers
         {
 
             return Ok(await _accountService.ResetPassword(model));
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            var response = await _accountService.RefreshTokenAsync(refreshToken, GenerateIPAddress());
+            if (!string.IsNullOrEmpty(response.Data.RefreshToken))
+                SetRefreshTokenInCookie(response.Data.RefreshToken);
+            return Ok(response);
+        }
+
+        [HttpPost("revoke-token")]
+        public async Task<IActionResult> RevokeToken(RevokeTokenRequest model)
+        {
+            // accept token from request body or cookie
+            var token = model.Token ?? Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(token))
+                return Ok(new Response<string>() { Succeeded = false, Message = "Token is required" });
+
+            var response =await _accountService.RevokeToken(token);
+
+            if (!response)
+                return Ok(new Response<string>() { Succeeded = false, Message = "Token not found" });
+
+            return Ok(new Response<string>() { Succeeded = true, Message = "Token revoked" });
+        }
+
+        [Authorize]
+        [HttpPost("tokens/{id}")]
+        public async Task<IActionResult> GetRefreshTokens(string id)
+        {
+            var refreshTokens = await _accountService.GetRefreshTokenList(id);
+            return Ok(refreshTokens);
+        }
+
+        private void SetRefreshTokenInCookie(string refreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(10),
+                //SameSite = SameSiteMode.None
+            };
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
 
         private string GenerateIPAddress()

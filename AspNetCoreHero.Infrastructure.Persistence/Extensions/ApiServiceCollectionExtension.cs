@@ -64,7 +64,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(o =>
-               {                   
+               {
                    o.RequireHttpsMetadata = false;
                    o.SaveToken = false;
                    o.TokenValidationParameters = new TokenValidationParameters
@@ -110,15 +110,10 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
             /// 
 
             services.ConfigureApplicationCookie(options =>
-            {
-                //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-                //options.Cookie.Name = "YourAppCookieName";
+            {   
+                //options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.HttpOnly = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-                //options.LoginPath = "/Identity/Account/Login";
-                // ReturnUrlParameter requires 
-                //using Microsoft.AspNetCore.Authentication.Cookies;
-                //options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+                //options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
                 options.SlidingExpiration = true;
             });
 
