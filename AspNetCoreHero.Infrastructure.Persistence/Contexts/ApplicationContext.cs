@@ -19,7 +19,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options, IDateTimeService dateTime, IAuthenticatedUserService authenticatedUser) : base(options)
         {
-            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll; // Update 09/12/2020
             _dateTime = dateTime;
             _authenticatedUser = authenticatedUser;
         }
@@ -45,7 +45,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 DateTime = _dateTime.Now,
                                 UserId = _authenticatedUser.UserId,
                                 UserName = _authenticatedUser.Username,                               
-                                CurrentValue = JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
+                                CurrentValue = entry.CurrentValues?.ToObject() == null? null : JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = ""
                             });
@@ -65,8 +65,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 DateTime = _dateTime.Now,
                                 UserId = _authenticatedUser.UserId,
                                 UserName = _authenticatedUser.Username,
-                                OriginalValue = JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
-                                CurrentValue = JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
+                                OriginalValue = entry.OriginalValues?.ToObject() == null ? null : JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
+                                CurrentValue = entry.CurrentValues?.ToObject() == null ? null : JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = entry.Entity.Id.ToString()
                             }) ;
@@ -85,7 +85,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 DateTime = _dateTime.Now,
                                 UserId = _authenticatedUser.UserId,
                                 UserName = _authenticatedUser.Username,
-                                OriginalValue = JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
+                                OriginalValue = entry.OriginalValues?.ToObject() == null ? null : JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = entry.Entity.Id.ToString()
                             });
