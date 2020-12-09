@@ -57,7 +57,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Helpers
         {
             return new RefreshToken
             {
-                Token = RandomTokenString(),
+                Token = RandomToken(),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Created = DateTime.UtcNow,
                 CreatedByIp = ipAddress
