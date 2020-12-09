@@ -2,6 +2,7 @@
 using AspNetCoreHero.Domain.Common;
 using AspNetCoreHero.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options, IDateTimeService dateTime, IAuthenticatedUserService authenticatedUser) : base(options)
         {
-            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
             _dateTime = dateTime;
             _authenticatedUser = authenticatedUser;
         }
@@ -35,7 +36,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                 {
                     case EntityState.Added:
                         entry.Entity.Created = _dateTime.Now;
-                        entry.Entity.CreatedBy = _authenticatedUser.UserId;
+                        entry.Entity.CreatedBy = _authenticatedUser.UserId;                        
                         try
                         {
                             await ActivityLogs.AddAsync(new ActivityLog
@@ -43,7 +44,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 Action = "Added",
                                 DateTime = _dateTime.Now,
                                 UserId = _authenticatedUser.UserId,
-                                UserName = _authenticatedUser.Username,
+                                UserName = _authenticatedUser.Username,                               
+                                CurrentValue = JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = ""
                             });
@@ -54,6 +56,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                     case EntityState.Modified:
                         entry.Entity.LastModified = _dateTime.Now;
                         entry.Entity.LastModifiedBy = _authenticatedUser.UserId;
+
                         try
                         {
                             await ActivityLogs.AddAsync(new ActivityLog
@@ -62,6 +65,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 DateTime = _dateTime.Now,
                                 UserId = _authenticatedUser.UserId,
                                 UserName = _authenticatedUser.Username,
+                                OriginalValue = JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
+                                CurrentValue = JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = entry.Entity.Id.ToString()
                             }) ;
@@ -80,6 +85,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 DateTime = _dateTime.Now,
                                 UserId = _authenticatedUser.UserId,
                                 UserName = _authenticatedUser.Username,
+                                OriginalValue = JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = entry.Entity.Id.ToString()
                             });

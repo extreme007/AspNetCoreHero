@@ -10,10 +10,10 @@ namespace AspNetCoreHero.Domain.Common
         public string UserId { get; set; }
         public string UserName { get; set; }
         public DateTime DateTime { get; set; }
-
         public string Action { get; set; }
+        public string OriginalValue { get; set; }
+        public string CurrentValue { get; set; }
         public string Entity{ get; set; }
-
         public string EntityId { get; set; }
     }
 }
