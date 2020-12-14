@@ -211,26 +211,88 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
         }        
 
 
-
-        public int ExecWithStoreProcedure(string query, params object[] parameters)
+        public async Task<ICollection<T>> ExecWithStoreProcedureAsync(string query, params object[] parameters)
         {
-            return _dbContext.Database.ExecuteSqlRaw(query, parameters);
+            string pamameterString = string.Empty;
+            if (!query.Contains("@p"))
+            {
+                if (parameters != null)
+                {
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        pamameterString += " @p" + i.ToString() + ",";
+                    }
+                }
+                if (!string.IsNullOrEmpty(pamameterString))
+                {
+                    pamameterString = pamameterString.Substring(0, pamameterString.Length - 1);
+                }
+            }
+            string fullquery = query + pamameterString;
+            return await _dbContext.Set<T>().FromSqlRaw(fullquery, parameters).ToListAsync();
         }
 
-
-        public async Task<int> ExecWithStoreProcedureAsync(string query, params object[] parameters)
+        public ICollection<T> ExecWithStoreProcedure(string query, params object[] parameters)
         {
-            return await _dbContext.Database.ExecuteSqlRawAsync(query,parameters);
+            string pamameterString = string.Empty;
+            if (!query.Contains("@p"))
+            {
+                if (parameters != null)
+                {
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        pamameterString += " @p" + i.ToString() + ",";
+                    }
+                }
+                if (!string.IsNullOrEmpty(pamameterString))
+                {
+                    pamameterString = pamameterString.Substring(0, pamameterString.Length - 1);
+                }
+            }
+            string fullquery = query + pamameterString;
+            return _dbContext.Set<T>().FromSqlRaw(fullquery, parameters).ToList();
         }
 
-        public async Task<int> ExecuteWithStoreProcedureAsync(string query, params object[] parameters)
+        public int ExecWithStoreProcedureCommand(string query, params object[] parameters)
         {
-             return await _dbContext.Database.ExecuteSqlCommandAsync(query, parameters);
+            string pamameterString = string.Empty;
+            if (!query.Contains("@p"))
+            {
+                if (parameters != null)
+                {
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        pamameterString += " @p" + i.ToString() + ",";
+                    }
+                }
+                if (!string.IsNullOrEmpty(pamameterString))
+                {
+                    pamameterString = pamameterString.Substring(0, pamameterString.Length - 1);
+                }
+            }
+            string fullquery = query + pamameterString;
+            return _dbContext.Database.ExecuteSqlCommand(fullquery, parameters);
         }
 
-        public int ExecuteWithStoreProcedure(string query, params object[] parameters)
+        public async Task<int> ExecWithStoreProcedureCommandAsync(string query, params object[] parameters)
         {
-            return _dbContext.Database.ExecuteSqlCommand(query, parameters);
+            string pamameterString = string.Empty;
+            if (!query.Contains("@p"))
+            {
+                if (parameters != null)
+                {
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        pamameterString += " @p" + i.ToString() + ",";
+                    }
+                }
+                if (!string.IsNullOrEmpty(pamameterString))
+                {
+                    pamameterString = pamameterString.Substring(0, pamameterString.Length - 1);
+                }
+            }
+            string fullquery = query + pamameterString;
+            return await _dbContext.Database.ExecuteSqlCommandAsync(fullquery, parameters);
         }
     }
 }

@@ -44,9 +44,9 @@ namespace AspNetCoreHero.Application.Interfaces.Repositories
         IQueryable<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties);
 
         //store procedure
-        int ExecWithStoreProcedure(string query, params object[] parameters);
-        Task<int> ExecWithStoreProcedureAsync(string query, params object[] parameters);
-        Task<int> ExecuteWithStoreProcedureAsync(string query, params object[] parameters);
-        int ExecuteWithStoreProcedure(string query, params object[] parameters);
+        Task<ICollection<T>> ExecWithStoreProcedureAsync(string query, params object[] parameters);
+        ICollection<T> ExecWithStoreProcedure(string query, params object[] parameters);   
+        int ExecWithStoreProcedureCommand(string query, params object[] parameters);
+        Task<int> ExecWithStoreProcedureCommandAsync(string query, params object[] parameters);
     }
 }
