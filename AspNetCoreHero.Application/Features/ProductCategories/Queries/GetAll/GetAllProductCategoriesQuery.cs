@@ -37,7 +37,7 @@ namespace AspNetCoreHero.Application.Features.ProductCategories.Queries.GetAll
         public async Task<PagedResponse<IEnumerable<GetAllProductCategoryViewModel>>> Handle(GetAllProductCategoriesQuery request, CancellationToken cancellationToken)
         {
             int totalRecords = await _productCategoryRepository.CountAsync();
-            if(request.PageNumber == -1) // get All
+            if(request.PageNumber == 0) // get All
             {
                 var data = await _productCategoryRepository.GetAllAsync();
                 var allCategoriesViewModel = _mapper.Map<IEnumerable<GetAllProductCategoryViewModel>>(data);
@@ -46,7 +46,7 @@ namespace AspNetCoreHero.Application.Features.ProductCategories.Queries.GetAll
             }         
             var pageSize = request.PageSize < 1 ? _paginationConfiguration.PageSize : request.PageSize ;
             var validFilter = new PaginationFilter(request.PageNumber, pageSize);
-            var categories = await _productCategoryRepository.GetPagedReponseAsync(validFilter.PageNumber, validFilter.PageSize);
+            var categories = await _productCategoryRepository.GetPagedResponseAsync(validFilter.PageNumber, validFilter.PageSize);
 
             var categoriesViewModel = _mapper.Map<IEnumerable<GetAllProductCategoryViewModel>>(categories);
 

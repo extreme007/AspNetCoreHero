@@ -37,29 +37,21 @@ namespace AspNetCoreHero.Application.Features.Products.Queries.GetAll
 
         public async Task<PagedResponse<IEnumerable<GetAllProductsViewModel>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
-            //var product = new List<Product>();
-            //var pageSize = request.PageSize < 1 ? _paginationConfiguration.PageSize : request.PageSize;
-            //var validFilter = new PaginationFilter(request.PageNumber, pageSize);
-            //if (request.ReturnImages)
-            //{
-            //    var productWithImages = await _productRepository.GetAllWithCategoriesAsync(validFilter.PageNumber, validFilter.PageSize);
-            //    product = productWithImages.ToList();
-            //}
-            //else
-            //{
-            //    var productWithoutImages = await _productRepository.GetAllWithCategoriesWithoutImagesAsync(validFilter.PageNumber,validFilter.PageSize);
-            //    product = productWithoutImages.ToList();
-            //}
-            //var productViewModel = _mapper.Map<IEnumerable<GetAllProductsViewModel>>(product);
-            //var result = PaginationHelper.CreatePagedReponse<GetAllProductsViewModel>(productViewModel, validFilter,product.Count());
-            //return result;
-
-
             int totalRecords = await _productRepository.CountAsync();
+            if (request.PageNumber == 0) // get All
+            {
+                var data = await _productRepository.GetAllAsync();
+                var allProductViewModel = _mapper.Map<IEnumerable<GetAllProductsViewModel>>(data);
+                var filterAll = new PaginationFilter(1, totalRecords);
+                return PaginationHelper.CreatePagedReponse<GetAllProductsViewModel>(allProductViewModel, filterAll, totalRecords);
+            }
             var pageSize = request.PageSize < 1 ? _paginationConfiguration.PageSize : request.PageSize;
             var validFilter = new PaginationFilter(request.PageNumber, pageSize);
-            var products = await _productRepository.GetPagedReponseAsync(validFilter.PageNumber, validFilter.PageSize, "ProductCategory");
-            var productsViewModel = _mapper.Map<IEnumerable<GetAllProductsViewModel>>(products);
+            //var products =  _productRepository.GetAllIncluding(x=>x.ProductCategory);
+            //var dataPaged = products.Skip((validFilter.PageNumber - 1) * pageSize)
+            //    .Take(pageSize);            
+            var dataPaged = await _productRepository.GetPagedResponseAsync(validFilter.PageNumber, validFilter.PageSize, "ProductCategory");
+            var productsViewModel = _mapper.Map<IEnumerable<GetAllProductsViewModel>>(dataPaged);
             var result = PaginationHelper.CreatePagedReponse<GetAllProductsViewModel>(productsViewModel, validFilter, totalRecords);
             return result;
         }

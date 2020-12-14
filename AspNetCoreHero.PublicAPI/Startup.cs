@@ -37,6 +37,7 @@ namespace AspNetCoreHero.PublicAPI
             services.AddControllers();
             services.AddPersistenceInfrastructureForApi(_configuration);
             services.AddHttpContextAccessor();
+            services.AddHealthChecks();
             //For In-Memory Caching
             services.AddMemoryCache();
             services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
@@ -64,6 +65,7 @@ namespace AspNetCoreHero.PublicAPI
             app.UseAuthorization();
             app.UseSwaggerService();
             app.UseErrorHandlingMiddleware();
+            app.UseHealthChecks("/health");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

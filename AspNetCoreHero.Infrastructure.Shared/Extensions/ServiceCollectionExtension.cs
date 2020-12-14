@@ -17,15 +17,15 @@ namespace AspNetCoreHero.Infrastructure.Shared.Extensions
         {
             services.Configure<MailConfiguration>(_config.GetSection("MailConfiguration"));
             services.Configure<CacheConfiguration>(_config.GetSection("MemoryCacheConfiguration"));
-            services.AddTransient<IDateTimeService, DateTimeService>();
-            services.AddTransient<IMailService, MailService>();
+            services.AddSingleton<IDateTimeService, DateTimeService>();
+            services.AddSingleton<IMailService, MailService>();
             services.AddCaching();
         }
         private static void AddCaching(this IServiceCollection services)
         {
-            services.AddTransient<MemoryCacheService>();
-            services.AddTransient<RedisCacheService>();
-            services.AddTransient<Func<CacheTech, ICacheService>>(serviceProvider => key =>
+            services.AddSingleton<MemoryCacheService>();
+            services.AddSingleton<RedisCacheService>();
+            services.AddSingleton<Func<CacheTech, ICacheService>>(serviceProvider => key =>
             {
                 switch (key)
                 {

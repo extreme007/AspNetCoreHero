@@ -13,7 +13,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
     public class ProductCategoryRepositoryAsync : GenericRepositoryAsync<ProductCategory>, IProductCategoryRepositoryAsync
     {
         private readonly static CacheTech cacheTech = CacheTech.Memory;
-        private readonly string cacheKey = $"{typeof(Product)}";
+        private readonly string cacheKey = $"{typeof(ProductCategory)}";
         private readonly Func<CacheTech, ICacheService> _cacheService;
         private readonly DbSet<ProductCategory>  _category;
 

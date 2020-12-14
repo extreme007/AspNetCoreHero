@@ -52,7 +52,7 @@ namespace AspNetCoreHero.Application.Features.Products.Commands.Update
                     product.Image = command.Image;
                     product.ProductCategoryId = command.ProductCategoryId;
                     product.Barcode = command.Barcode;
-                    await _productRepository.UpdateAsync(product);
+                    await _productRepository.UpdateAsync(product,command.Id);
                     var result = await _unitOfWork.Commit(cancellationToken);
                     if (result > 0)
                     {

@@ -124,7 +124,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             {
                 httpResponseMessage = httpClient.GetAsync(requestUri).Result;
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
