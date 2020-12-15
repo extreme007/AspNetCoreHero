@@ -8,5 +8,7 @@ namespace AspNetCoreHero.Application.Interfaces.Shared
     {
         string UserId { get; }
         public string Username { get; }
+        public string Email { get; }
+        public List<string> Roles { get; }
     }
 }

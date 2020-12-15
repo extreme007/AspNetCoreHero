@@ -1,5 +1,6 @@
 ﻿using AspNetCoreHero.Application.Exceptions;
 using AspNetCoreHero.Application.Interfaces.Repositories;
+using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Application.Wrappers;
 using MediatR;
 using System;
@@ -17,16 +18,26 @@ namespace AspNetCoreHero.Application.Features.Products.Commands.Delete
         {
             private readonly IProductRepositoryAsync _productRepository;
             private readonly IUnitOfWork _unitOfWork;
-            public DeleteProductByIdCommandHandler(IProductRepositoryAsync productRepository, IUnitOfWork unitOfWork)
+            private readonly IDateTimeService _dateTime;
+            private readonly IAuthenticatedUserService _authenticatedUser;
+            public DeleteProductByIdCommandHandler(IProductRepositoryAsync productRepository, IUnitOfWork unitOfWork, IDateTimeService dateTime, IAuthenticatedUserService authenticatedUser)
             {
                 _productRepository = productRepository;
                 _unitOfWork = unitOfWork;
+                _dateTime = dateTime;
+                _authenticatedUser = authenticatedUser;
             }
             public async Task<Response<int>> Handle(DeleteProductByIdCommand command, CancellationToken cancellationToken)
             {
                 var product = await _productRepository.GetByIdAsync(command.Id);
                 if (product == null) throw new ApiException($"Product Not Found.");
-                await _productRepository.DeleteAsync(product);
+                //await _productRepository.DeleteAsync(product);
+
+                //Update status IsDeleted
+                product.DeletedBy = _authenticatedUser.UserId;
+                product.DeletionTime = _dateTime.Now;
+                product.IsDeleted = true;
+                await _productRepository.UpdateAsync(product,command.Id);
                 await _unitOfWork.Commit(cancellationToken);
                 return new Response<int>(product.Id);
             }

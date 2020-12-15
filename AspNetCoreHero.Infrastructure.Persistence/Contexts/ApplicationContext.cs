@@ -1,4 +1,5 @@
-﻿using AspNetCoreHero.Application.Interfaces.Shared;
+﻿using AspNetCoreHero.Application.Constants;
+using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Domain.Common;
 using AspNetCoreHero.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +42,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                         {
                             await ActivityLogs.AddAsync(new ActivityLog
                             {
-                                Action = "Added",
+                                Action = EntityActionType.Added,
                                 DateTime = _dateTime.Now,
                                 UserId = _authenticatedUser.UserId,
                                 UserName = _authenticatedUser.Username,                               
@@ -53,23 +54,27 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                         catch{}
                         
                         break;
-                    case EntityState.Modified:
-                        entry.Entity.LastModified = _dateTime.Now;
-                        entry.Entity.LastModifiedBy = _authenticatedUser.UserId;
-
+                    case EntityState.Modified:                                              
                         try
-                        {
+                        { 
+                            if (!entry.Entity.IsDeleted)
+                            {
+                                entry.Entity.LastModified = _dateTime.Now;
+                                entry.Entity.LastModifiedBy = _authenticatedUser.UserId;
+                            }                           
+
                             await ActivityLogs.AddAsync(new ActivityLog
                             {
-                                Action = "Modified",
+                                Action = entry.Entity.IsDeleted ? EntityActionType.Deleted : EntityActionType.Modified,
                                 DateTime = _dateTime.Now,
                                 UserId = _authenticatedUser.UserId,
                                 UserName = _authenticatedUser.Username,
                                 OriginalValue = entry.OriginalValues?.ToObject() == null ? null : JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
-                                CurrentValue = entry.CurrentValues?.ToObject() == null ? null : JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
+                                CurrentValue = entry.CurrentValues?.ToObject() == null || entry.Entity.IsDeleted ? null : JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = entry.Entity.Id.ToString()
-                            }) ;
+                            });
+
                         }
                         catch { }
                         break;
@@ -81,7 +86,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                         {
                             await ActivityLogs.AddAsync(new ActivityLog
                             {
-                                Action = "Deleted",
+                                Action = EntityActionType.Deleted,
                                 DateTime = _dateTime.Now,
                                 UserId = _authenticatedUser.UserId,
                                 UserName = _authenticatedUser.Username,
