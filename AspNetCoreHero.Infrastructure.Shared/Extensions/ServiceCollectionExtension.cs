@@ -19,10 +19,8 @@ namespace AspNetCoreHero.Infrastructure.Shared.Extensions
             services.Configure<CacheConfiguration>(_config.GetSection("MemoryCacheConfiguration"));
             services.AddSingleton<IDateTimeService, DateTimeService>();
             services.AddSingleton<IMailService, MailService>();
-            services.AddCaching();
-        }
-        private static void AddCaching(this IServiceCollection services)
-        {
+
+            // AddCaching
             services.AddSingleton<MemoryCacheService>();
             services.AddSingleton<RedisCacheService>();
             services.AddSingleton<Func<CacheTech, ICacheService>>(serviceProvider => key =>
@@ -37,6 +35,6 @@ namespace AspNetCoreHero.Infrastructure.Shared.Extensions
                         return serviceProvider.GetService<MemoryCacheService>();
                 }
             });
-        }
+        }    
     }
 }

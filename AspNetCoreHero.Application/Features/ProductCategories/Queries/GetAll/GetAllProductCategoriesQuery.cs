@@ -1,7 +1,6 @@
 ﻿using AspNetCoreHero.Application.Configurations;
-using AspNetCoreHero.Application.Filters;
-using AspNetCoreHero.Application.Helpers;
 using AspNetCoreHero.Application.Interfaces.Repositories;
+using AspNetCoreHero.Application.Parameters;
 using AspNetCoreHero.Application.Wrappers;
 using AspNetCoreHero.Domain.Entities;
 using AutoMapper;
@@ -36,22 +35,20 @@ namespace AspNetCoreHero.Application.Features.ProductCategories.Queries.GetAll
 
         public async Task<PagedResponse<IEnumerable<GetAllProductCategoryViewModel>>> Handle(GetAllProductCategoriesQuery request, CancellationToken cancellationToken)
         {
+            var pageSize = request.PageSize < 1 ? _paginationConfiguration.PageSize : request.PageSize;
             int totalRecords = await _productCategoryRepository.CountAsync();
-            if(request.PageNumber == 0) // get All
+            var validRequest = new RequestParameter(request.PageNumber, pageSize);
+            if (request.PageNumber == 0) // get All
             {
+                validRequest = new RequestParameter(1, totalRecords);
                 var data = await _productCategoryRepository.GetAllAsync();
                 var allCategoriesViewModel = _mapper.Map<IEnumerable<GetAllProductCategoryViewModel>>(data);
-                var filterAll = new PaginationFilter(1, totalRecords);
-                return PaginationHelper.CreatePagedReponse<GetAllProductCategoryViewModel>(allCategoriesViewModel, filterAll, totalRecords); ;
+                return new PagedResponse<IEnumerable<GetAllProductCategoryViewModel>>(allCategoriesViewModel, validRequest, totalRecords);
             }         
-            var pageSize = request.PageSize < 1 ? _paginationConfiguration.PageSize : request.PageSize ;
-            var validFilter = new PaginationFilter(request.PageNumber, pageSize);
-            var categories = await _productCategoryRepository.GetPagedResponseAsync(validFilter.PageNumber, validFilter.PageSize);
 
+            var categories = await _productCategoryRepository.GetPagedResponseAsync(validRequest.PageNumber, validRequest.PageSize);
             var categoriesViewModel = _mapper.Map<IEnumerable<GetAllProductCategoryViewModel>>(categories);
-
-            var result = PaginationHelper.CreatePagedReponse<GetAllProductCategoryViewModel>(categoriesViewModel, validFilter,totalRecords);
-            return result;
+            return new PagedResponse<IEnumerable<GetAllProductCategoryViewModel>>(categoriesViewModel, validRequest, totalRecords);
         }
     }
 }
