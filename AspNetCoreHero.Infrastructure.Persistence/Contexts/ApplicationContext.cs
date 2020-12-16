@@ -2,6 +2,7 @@
 using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Domain.Common;
 using AspNetCoreHero.Domain.Entities;
+using AspNetCoreHero.Infrastructure.Persistence.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -24,8 +25,9 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
             _dateTime = dateTime;
             _authenticatedUser = authenticatedUser;
         }
-        public DbSet<Product> Products { get; set; }
 
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductCategory> ProductCategory { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
@@ -48,7 +50,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 UserName = _authenticatedUser.Username,                               
                                 CurrentValue = entry.CurrentValues?.ToObject() == null? null : JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
                                 Entity = entityType,
-                                EntityId = ""
+                                EntityId = "",
+                                //IpAddress = IPHelper.GetIpAddress()
                             });
                         }
                         catch{}
@@ -72,7 +75,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 OriginalValue = entry.OriginalValues?.ToObject() == null ? null : JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
                                 CurrentValue = entry.CurrentValues?.ToObject() == null || entry.Entity.IsDeleted ? null : JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
                                 Entity = entityType,
-                                EntityId = entry.Entity.Id.ToString()
+                                EntityId = entry.Entity.Id.ToString(),
+                                //IpAddress = IPHelper.GetIpAddress()
                             });
 
                         }
@@ -92,7 +96,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 UserName = _authenticatedUser.Username,
                                 OriginalValue = entry.OriginalValues?.ToObject() == null ? null : JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
                                 Entity = entityType,
-                                EntityId = entry.Entity.Id.ToString()
+                                EntityId = entry.Entity.Id.ToString(),
+                                //IpAddress = IPHelper.GetIpAddress()
                             });
                         }
                         catch { }

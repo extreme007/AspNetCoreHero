@@ -15,5 +15,6 @@ namespace AspNetCoreHero.Domain.Common
         public string CurrentValue { get; set; }
         public string Entity{ get; set; }
         public string EntityId { get; set; }
+        public string IpAddress { get; set; }
     }
 }
