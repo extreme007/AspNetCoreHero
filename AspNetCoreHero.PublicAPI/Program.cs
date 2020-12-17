@@ -41,9 +41,7 @@ namespace AspNetCoreHero.PublicAPI
                 {
                     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-                    await Infrastructure.Persistence.Seeds.IdentityContextSeed.SeedRolesAsync(userManager, roleManager);
-                    await Infrastructure.Persistence.Seeds.IdentityContextSeed.SeedAdminAsync(userManager, roleManager);
-                    await Infrastructure.Persistence.Seeds.IdentityContextSeed.SeedBasicUserAsync(userManager, roleManager);
+                    await Infrastructure.Persistence.Seeds.IdentityContextSeed.SeedDataAsync(userManager, roleManager);
 
                     //_logger.LogInformation("Finished Seeding Default Data");
                     //_logger.LogInformation("Application Starting");

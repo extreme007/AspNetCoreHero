@@ -14,21 +14,75 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Seeds
 {
     public static class IdentityContextSeed
     {
-        public static async Task SeedRolesAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
         {
+            var listRoles = Enum.GetValues(typeof(Roles)).Cast<Roles>().Select(r=>r.ToString());
             //Seed Roles
-            await roleManager.CreateAsync(new IdentityRole(Roles.SuperAdmin.ToString()));
-            await roleManager.SeedClaimsForSuperAdmin();
+            foreach(var role in listRoles)
+            {
+                var existed = await roleManager.RoleExistsAsync(role);
+                if (!existed)
+                {
+                    await roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
+        }
 
+        public static async Task SeedUsersAsync(UserManager<ApplicationUser> userManager)
+        {
+            if(userManager.FindByEmailAsync("superadmin@gmail.com").Result == null)
+            {
+                //Seed Default SuperAdmin
+                var defaultSuperAdmin = new ApplicationUser
+                {
+                    UserName = "superadmin",
+                    Email = "superadmin@gmail.com",
+                    FirstName = "Super",
+                    LastName = "Admin",
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true,
+                    IsActive = true
+                };
+                IdentityResult result = userManager.CreateAsync(defaultSuperAdmin, "123Pa$$word!").Result;
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(defaultSuperAdmin, Roles.Basic.ToString());
+                    await userManager.AddToRoleAsync(defaultSuperAdmin, Roles.Moderator.ToString());
+                    await userManager.AddToRoleAsync(defaultSuperAdmin, Roles.Admin.ToString());
+                    await userManager.AddToRoleAsync(defaultSuperAdmin, Roles.SuperAdmin.ToString());
+                }
+            }
 
-            await roleManager.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
-            await roleManager.CreateAsync(new IdentityRole(Roles.Moderator.ToString()));
-            await roleManager.CreateAsync(new IdentityRole(Roles.Basic.ToString()));
+            if (userManager.FindByEmailAsync("basicuser@gmail.com").Result == null)
+            {
+                //Seed Default User
+                var defaultUser = new ApplicationUser
+                {
+                    UserName = "basicuser",
+                    Email = "basicuser@gmail.com",
+                    FirstName = "Basic",
+                    LastName = "User",
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true,
+                    IsActive = true
+                };
+                IdentityResult result = userManager.CreateAsync(defaultUser, "123Pa$$word!").Result;
+                if(result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(defaultUser, Roles.Basic.ToString());
+                }            
+            }
+        }
+
+        public static async Task SeedDataAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            await SeedRolesAsync(roleManager);
+            await SeedUsersAsync(userManager);
+            await SeedClaimsForSuperAdmin(roleManager);
         }
 
         private async static Task SeedClaimsForSuperAdmin(this RoleManager<IdentityRole> roleManager)
         {
-
             var adminRole = await roleManager.FindByNameAsync("SuperAdmin");
             await roleManager.AddPermissionClaim(adminRole, MasterPermissions.Create);
             await roleManager.AddPermissionClaim(adminRole, MasterPermissions.Update);
