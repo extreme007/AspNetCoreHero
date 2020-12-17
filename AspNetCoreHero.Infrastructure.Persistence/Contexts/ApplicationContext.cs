@@ -51,7 +51,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 CurrentValue = entry.CurrentValues?.ToObject() == null? null : JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = "",
-                                //IpAddress = IPHelper.GetIpAddress()
+                                IpAddress = IPHelper.GetIpAddress()
                             });
                         }
                         catch{}
@@ -76,7 +76,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 CurrentValue = entry.CurrentValues?.ToObject() == null || entry.Entity.IsDeleted ? null : JsonConvert.SerializeObject(entry.CurrentValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = entry.Entity.Id.ToString(),
-                                //IpAddress = IPHelper.GetIpAddress()
+                                IpAddress = IPHelper.GetIpAddress()
                             });
 
                         }
@@ -97,7 +97,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                                 OriginalValue = entry.OriginalValues?.ToObject() == null ? null : JsonConvert.SerializeObject(entry.OriginalValues.ToObject()),
                                 Entity = entityType,
                                 EntityId = entry.Entity.Id.ToString(),
-                                //IpAddress = IPHelper.GetIpAddress()
+                                IpAddress = IPHelper.GetIpAddress()
                             });
                         }
                         catch { }
