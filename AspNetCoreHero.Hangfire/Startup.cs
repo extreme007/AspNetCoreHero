@@ -25,6 +25,7 @@ namespace AspNetCoreHero.Hangfire
         {
             services.AddHangfire(x => x.UseSqlServerStorage(_configuration.GetConnectionString("DefaultConnection")));
             services.AddHangfireServer();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,10 +36,20 @@ namespace AspNetCoreHero.Hangfire
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
+
             app.UseRouting();
-            app.UseHangfireDashboard("");
+
+            app.UseAuthorization();
+            app.UseAuthentication();
+            //app.UseHangfireDashboard("/hangfire",new DashboardOptions { 
+            //    Authorization = new[] {new HangfireAuthorizationFilter()}
+            //});
+            app.UseHangfireDashboard();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
             });
         }
     }

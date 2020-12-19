@@ -42,7 +42,8 @@ namespace AspNetCoreHero.Application.Features.Products.Queries.GetAll
             if (request.PageNumber == 0) // get All
             {
                 validRequest = new RequestParameter(1, totalRecords);
-                var data = await _productRepository.GetAllAsync();
+                //var data = await _productRepository.GetAllAsync();
+                var data =  _productRepository.GetAllIncluding(x=>x.ProductCategory);                
                 var allProductViewModel = _mapper.Map<IEnumerable<GetAllProductsViewModel>>(data);
                 return new PagedResponse<IEnumerable<GetAllProductsViewModel>>(allProductViewModel, validRequest, totalRecords);
             }
