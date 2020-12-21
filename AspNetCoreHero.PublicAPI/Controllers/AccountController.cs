@@ -26,7 +26,8 @@ namespace AspNetCoreHero.PublicAPI.Controllers
         public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
         {
             var result = await _accountService.AuthenticateAsync(request, GenerateIPAddress());
-            SetRefreshTokenInCookie(result.Data.RefreshToken);
+            var data = result.Data;
+            SetTokenInCookie(data.RefreshToken, data.AccessToken);
             return Ok(result);
         }
 
@@ -65,7 +66,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers
             var refreshToken = Request.Cookies["refreshToken"];
             var response = await _accountService.RefreshTokenAsync(refreshToken, GenerateIPAddress());
             if (!string.IsNullOrEmpty(response.Data.RefreshToken))
-                SetRefreshTokenInCookie(response.Data.RefreshToken);
+                SetTokenInCookie(response.Data.RefreshToken);
             return Ok(response);
         }
 
@@ -94,7 +95,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers
             return Ok(refreshTokens);
         }
 
-        private void SetRefreshTokenInCookie(string refreshToken)
+        private void SetTokenInCookie(string refreshToken, string accessTokenHangfire = "")
         {
             var cookieOptions = new CookieOptions
             {
@@ -103,6 +104,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers
                 //SameSite = SameSiteMode.None
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+            Response.Cookies.Append("accessTokenHangfire", accessTokenHangfire, cookieOptions);
         }
 
         private string GenerateIPAddress()

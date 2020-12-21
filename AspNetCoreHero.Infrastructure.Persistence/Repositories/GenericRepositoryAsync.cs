@@ -2,6 +2,7 @@
 using AspNetCoreHero.Application.Interfaces.Repositories;
 using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Infrastructure.Persistence.Contexts;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -27,17 +28,26 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             //dbSet = _dbContext.Set<T>();
         }
 
+        public async Task RefreshCache()
+        {
+            _cacheService(cacheTech).Remove(cacheKey);
+            var cachedList = await _dbContext.Set<T>().ToListAsync();
+            _cacheService(cacheTech).Set(cacheKey, cachedList);
+        }
+
         public T Add(T entity)
         {
             _dbContext.Set<T>().Add(entity);
-            _cacheService(cacheTech).Remove(cacheKey);
+            //_cacheService(cacheTech).Remove(cacheKey);
+            BackgroundJob.Enqueue(() => RefreshCache());
             return entity;
         }
 
         public async Task<T> AddAsync(T entity)
         {
             await _dbContext.Set<T>().AddAsync(entity);
-            _cacheService(cacheTech).Remove(cacheKey);
+            //_cacheService(cacheTech).Remove(cacheKey);
+            BackgroundJob.Enqueue(() => RefreshCache());
             return entity;
         }
 
@@ -54,13 +64,15 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
         public void Delete(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
-            _cacheService(cacheTech).Remove(cacheKey);
+            //_cacheService(cacheTech).Remove(cacheKey);
+            BackgroundJob.Enqueue(() => RefreshCache());
         }
 
         public Task DeleteAsync(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
-            _cacheService(cacheTech).Remove(cacheKey);
+            //_cacheService(cacheTech).Remove(cacheKey);
+            BackgroundJob.Enqueue(() => RefreshCache());
             return Task.CompletedTask;
         }
 
@@ -119,15 +131,40 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             return cachedList;
         }
 
-        public IQueryable<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties)
+        public async Task<ICollection<T>> GetAllIncludingAsync(params Expression<Func<T, object>>[] includeProperties)
         {
-            IQueryable<T> queryable = _dbContext.Set<T>();
-            foreach (Expression<Func<T, object>> includeProperty in includeProperties)
+            if (!_cacheService(cacheTech).TryGet(cacheKey, out ICollection<T> cachedList))
             {
-                queryable = queryable.Include<T, object>(includeProperty);
+                IQueryable<T> queryable = _dbContext.Set<T>();
+                foreach (Expression<Func<T, object>> includeProperty in includeProperties)
+                {
+                    queryable = queryable.Include<T, object>(includeProperty);
+                }
+
+                cachedList = await queryable.ToListAsync();
+                 
+                _cacheService(cacheTech).Set(cacheKey, cachedList);
+            }         
+
+            return cachedList;
+        }
+
+        public ICollection<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties)
+        {
+            if (!_cacheService(cacheTech).TryGet(cacheKey, out ICollection<T> cachedList))
+            {
+                IQueryable<T> queryable = _dbContext.Set<T>();
+                foreach (Expression<Func<T, object>> includeProperty in includeProperties)
+                {
+                    queryable = queryable.Include<T, object>(includeProperty);
+                }
+
+                cachedList =  queryable.ToList();
+
+                _cacheService(cacheTech).Set(cacheKey, cachedList);
             }
 
-            return queryable;
+            return cachedList;
         }
 
         public T GetById(int id)
@@ -142,28 +179,26 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
 
         public T Update(T entity, object key)
         {
-            if (entity == null)
-                return null;
             T exist = _dbContext.Set<T>().Find(key);
             if (exist != null)
             {
                 _dbContext.Entry(exist).CurrentValues.SetValues(entity);
                 _dbContext.Entry(entity).State = EntityState.Modified;
-                _cacheService(cacheTech).Remove(cacheKey);
+                //_cacheService(cacheTech).Remove(cacheKey);
+                BackgroundJob.Enqueue(() => RefreshCache());
             }
             return exist;
         }
-
+            
         public async Task<T> UpdateAsync(T entity, object key)
         {
-            if (entity == null)
-                return null;
             T exist = await _dbContext.Set<T>().FindAsync(key);
             if (exist != null)
             {
                 _dbContext.Entry(exist).CurrentValues.SetValues(entity);
                 _dbContext.Entry(entity).State = EntityState.Modified;
-                _cacheService(cacheTech).Remove(cacheKey);
+                //_cacheService(cacheTech).Remove(cacheKey);
+                BackgroundJob.Enqueue(() => RefreshCache());
             }
             return exist;
         }
@@ -207,8 +242,28 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
                     queryable = queryable.Include(IncludeProperty);
                 }
             }
+
             return await queryable.ToListAsync();
-        }        
+        }
+
+        public ICollection<T> GetPagedResponse(int pageNumber, int pageSize, string includeProperties = "")
+        {
+            var queryable = _dbContext.Set<T>()
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (string IncludeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    queryable = queryable.Include(IncludeProperty);
+                }
+            }
+
+            return  queryable.ToList();
+        }
 
 
         public async Task<ICollection<T>> ExecWithStoreProcedureAsync(string query, params object[] parameters)

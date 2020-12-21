@@ -3,7 +3,10 @@ using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Infrastructure.Persistence.Extensions;
 using AspNetCoreHero.Infrastructure.Shared.Extensions;
 using AspNetCoreHero.PublicAPI.Extensions;
+using AspNetCoreHero.PublicAPI.Filter;
 using AspNetCoreHero.PublicAPI.Services;
+using Hangfire;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +45,10 @@ namespace AspNetCoreHero.PublicAPI
             services.AddMemoryCache();
             services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
 
+            //Hangfire
+            services.AddHangfire(_configuration);
+          
+
             services.Configure<FormOptions>(o => {
                 o.ValueLengthLimit = int.MaxValue;
                 o.MultipartBodyLengthLimit = int.MaxValue;
@@ -76,6 +83,13 @@ namespace AspNetCoreHero.PublicAPI
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
                 RequestPath = new PathString("/Resources")
+            });
+
+            ////Hangfire
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                IsReadOnlyFunc = (DashboardContext context) => true,
+                Authorization = new[] { new HangfireAuthorizationFilter("SuperAdmin") }
             });
         }
     }

@@ -1,4 +1,5 @@
 ﻿using AspNetCoreHero.Application.Configurations;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,6 +73,11 @@ namespace AspNetCoreHero.PublicAPI.Extensions
                     },
                 });
             });
-        }      
+        }
+        public static void AddHangfire(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHangfire(x => x.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
+            services.AddHangfireServer();
+        }
     }
 }

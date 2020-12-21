@@ -13,6 +13,7 @@ namespace AspNetCoreHero.Application.Interfaces.Repositories
         Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
         string includeProperties = "");
         Task<ICollection<T>> GetPagedResponseAsync(int pageNumber, int pageSize, string includeProperties = "");
+        ICollection<T> GetPagedResponse(int pageNumber, int pageSize, string includeProperties = "");
 
         T Add(T entity);
         Task<T> AddAsync(T entity);
@@ -40,8 +41,8 @@ namespace AspNetCoreHero.Application.Interfaces.Repositories
 
         ICollection<T> GetAll();
         Task<ICollection<T>> GetAllAsync();
-
-        IQueryable<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties);
+        ICollection<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties);
+        Task<ICollection<T>> GetAllIncludingAsync(params Expression<Func<T, object>>[] includeProperties);
 
         //store procedure
         Task<ICollection<T>> ExecWithStoreProcedureAsync(string query, params object[] parameters);
