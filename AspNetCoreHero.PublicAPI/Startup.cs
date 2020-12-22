@@ -89,7 +89,9 @@ namespace AspNetCoreHero.PublicAPI
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
                 IsReadOnlyFunc = (DashboardContext context) => true,
-                Authorization = new[] { new HangfireAuthorizationFilter("SuperAdmin") }
+                Authorization = new[] { new HangfireAuthorizationFilter("SuperAdmin") },
+                //AppPath = null// "localhost.com:3000"
+                AppPath = !string.IsNullOrEmpty(_configuration.GetSection("AllowedOrigins")?.Value) ? _configuration.GetSection("AllowedOrigins")?.Value.Split(";")[0] : null,
             });
         }
     }
