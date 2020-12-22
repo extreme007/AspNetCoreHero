@@ -8,6 +8,7 @@ using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Application.Wrappers;
 using AspNetCoreHero.Infrastructure.Persistence.Helpers;
 using AspNetCoreHero.Infrastructure.Persistence.Identity;
+using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
@@ -114,12 +115,16 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
                     await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
                     var verificationUri = await SendVerificationEmail(user, origin);
                     //TODO: Attach Email Service here and configure it via appsettings
-                    await _mailService.SendAsync(new MailRequest() { 
+
+                    var mailRequest = new MailRequest()
+                    {
                         From = _mailSettings.From,
                         To = user.Email,
                         Body = $"Please confirm your account by visiting this URL {verificationUri}",
-                        Subject = "Confirm Registration" 
-                    });
+                        Subject = "Confirm Registration"
+                    };
+                    BackgroundJob.Enqueue(() => SendEmailBackgroundJob(mailRequest));
+                    //await _mailService.SendAsync(mailRequest);
                     return new Response<string>(user.Id, message: $"User Registered. Please confirm your account by visiting this URL {verificationUri}");
                 }
                 else
@@ -131,6 +136,11 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             {
                 throw new ApiException($"Email {request.Email } is already registered.");
             }
+        }
+
+        private async Task SendEmailBackgroundJob(MailRequest mailRequest)
+        {
+            await _mailService.SendAsync(mailRequest);
         }
 
         private async Task<string> SendVerificationEmail(ApplicationUser user, string origin)
@@ -191,7 +201,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
                 To = model.Email,
                 Subject = "Reset Password",
             };
-            await _mailService.SendAsync(emailRequest);
+            BackgroundJob.Enqueue(() => SendEmailBackgroundJob(emailRequest));
+           // await _mailService.SendAsync(emailRequest);
         }
 
         public async Task<Response<string>> ResetPassword(ResetPasswordRequest model)
