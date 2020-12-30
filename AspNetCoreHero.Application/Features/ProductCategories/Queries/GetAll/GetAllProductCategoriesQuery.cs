@@ -1,4 +1,4 @@
-﻿using AspNetCoreHero.Application.Configurations;
+﻿using AspNetCoreHero.Application.DTOs.Settings;
 using AspNetCoreHero.Application.Interfaces.Repositories;
 using AspNetCoreHero.Application.Parameters;
 using AspNetCoreHero.Application.Wrappers;
@@ -24,18 +24,18 @@ namespace AspNetCoreHero.Application.Features.ProductCategories.Queries.GetAll
     {
         private readonly IProductCategoryRepositoryAsync _productCategoryRepository;
         private readonly IMapper _mapper;
-        private readonly PaginationConfiguration _paginationConfiguration;
+        private readonly PaginationSettings _paginationSettings;
 
-        public GetAllProductsQueryHandler(IProductCategoryRepositoryAsync productCategoryRepository, IMapper mapper,IOptions<PaginationConfiguration> paginationConfiguration)
+        public GetAllProductsQueryHandler(IProductCategoryRepositoryAsync productCategoryRepository, IMapper mapper,IOptions<PaginationSettings> paginationSettings)
         {
             _productCategoryRepository = productCategoryRepository;
             _mapper = mapper;
-            _paginationConfiguration = paginationConfiguration.Value;
+            _paginationSettings = paginationSettings.Value;
         }
 
         public async Task<PagedResponse<IEnumerable<GetAllProductCategoryViewModel>>> Handle(GetAllProductCategoriesQuery request, CancellationToken cancellationToken)
         {
-            var pageSize = request.PageSize < 1 ? _paginationConfiguration.PageSize : request.PageSize;
+            var pageSize = request.PageSize < 1 ? _paginationSettings.PageSize : request.PageSize;
             int totalRecords = await _productCategoryRepository.CountAsync();
             var validRequest = new RequestParameter(request.PageNumber, pageSize);
             if (request.PageNumber == 0) // get All

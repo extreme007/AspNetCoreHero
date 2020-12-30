@@ -1,5 +1,5 @@
-﻿using AspNetCoreHero.Application.Configurations;
-using AspNetCoreHero.Application.Enums.Services;
+﻿using AspNetCoreHero.Application.DTOs.Settings;
+using AspNetCoreHero.Application.Enums;
 using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Infrastructure.Shared.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +15,8 @@ namespace AspNetCoreHero.Infrastructure.Shared.Extensions
     {
         public static void AddSharedInfrastructure(this IServiceCollection services, IConfiguration _config)
         {
-            services.Configure<MailConfiguration>(_config.GetSection("MailConfiguration"));
-            services.Configure<CacheConfiguration>(_config.GetSection("MemoryCacheConfiguration"));
+            services.Configure<MailSettings>(_config.GetSection("MailConfiguration"));
+            services.Configure<CacheSettings>(_config.GetSection("MemoryCacheConfiguration"));
             services.AddSingleton<IDateTimeService, DateTimeService>();
             services.AddSingleton<IMailService, MailService>();
 

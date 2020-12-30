@@ -19,20 +19,20 @@ namespace AspNetCoreHero.PublicAPI.Controllers.v1
         [Authorize(Roles ="Basic")]
         public async Task<IActionResult> Get([FromQuery] GetAllProductCategoriesQuery filter)
         {           
-            return Ok(await Mediator.Send(new GetAllProductCategoriesQuery() { PageSize = filter.PageSize, PageNumber = filter.PageNumber }));
+            return Ok(await _mediator.Send(new GetAllProductCategoriesQuery() { PageSize = filter.PageSize, PageNumber = filter.PageNumber }));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {         
-            return Ok(await Mediator.Send(new GetProductCategoryByIdQuery { Id = id }));
+            return Ok(await _mediator.Send(new GetProductCategoryByIdQuery { Id = id }));
         }
 
         // POST api/<controller>
         [HttpPost]
         public async Task<IActionResult> Post(CreateProductCategoryCommand command)
         {
-            return Ok(await Mediator.Send(command));
+            return Ok(await _mediator.Send(command));
         }
 
         // PUT api/<controller>/5
@@ -43,14 +43,14 @@ namespace AspNetCoreHero.PublicAPI.Controllers.v1
             {
                 return BadRequest();
             }
-            return Ok(await Mediator.Send(command));
+            return Ok(await _mediator.Send(command));
         }
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            return Ok(await Mediator.Send(new DeleteProductCategoryByIdCommand { Id = id }));
+            return Ok(await _mediator.Send(new DeleteProductCategoryByIdCommand { Id = id }));
         }
     }
 }

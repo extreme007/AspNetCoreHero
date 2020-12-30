@@ -1,5 +1,4 @@
-﻿using AspNetCoreHero.Application.Configurations;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

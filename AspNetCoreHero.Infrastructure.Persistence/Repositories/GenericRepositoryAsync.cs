@@ -1,4 +1,4 @@
-﻿using AspNetCoreHero.Application.Enums.Services;
+﻿using AspNetCoreHero.Application.Enums;
 using AspNetCoreHero.Application.Interfaces.Repositories;
 using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Infrastructure.Persistence.Contexts;

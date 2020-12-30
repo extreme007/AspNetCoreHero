@@ -1,6 +1,6 @@
 ﻿using AspNetCoreHero.Application.Constants;
 using AspNetCoreHero.Application.Constants.Permissions;
-using AspNetCoreHero.Application.Enums.Identity;
+using AspNetCoreHero.Application.Enums;
 using AspNetCoreHero.Infrastructure.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
 using System;

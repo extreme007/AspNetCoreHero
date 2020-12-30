@@ -1,5 +1,5 @@
-﻿using AspNetCoreHero.Application.Configurations;
-using AspNetCoreHero.Application.DTOs.Mail;
+﻿using AspNetCoreHero.Application.DTOs.Mail;
+using AspNetCoreHero.Application.DTOs.Settings;
 using AspNetCoreHero.Application.Interfaces.Shared;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -12,10 +12,10 @@ namespace AspNetCoreHero.Infrastructure.Shared.Services
 {
     public class MailService : IMailService
     {
-        public MailConfiguration _mailSettings { get; }
+        public MailSettings _mailSettings { get; }
         public ILogger<MailService> _logger { get; }
 
-        public MailService(IOptions<MailConfiguration> mailSettings, ILogger<MailService> logger)
+        public MailService(IOptions<MailSettings> mailSettings, ILogger<MailService> logger)
         {
             _mailSettings = mailSettings.Value;
             _logger = logger;

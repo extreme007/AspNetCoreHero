@@ -1,4 +1,4 @@
-﻿using AspNetCoreHero.Application.Configurations;
+﻿using AspNetCoreHero.Application.DTOs.Settings;
 using AspNetCoreHero.Application.Interfaces;
 using AspNetCoreHero.Application.Interfaces.Repositories;
 using AspNetCoreHero.Application.Wrappers;
@@ -51,14 +51,13 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
                     options.User.RequireUniqueEmail = false;
                 }).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly(typeof(ApplicationContext).Assembly.FullName)));
-            services.AddRepositories();
             #region Services
             services.AddTransient<IExternalAuthService, ExternalAuthService>();
             services.AddTransient<IAccountService, AccountService>();
             #endregion
-            services.Configure<JWTConfiguration>(configuration.GetSection("JWTConfiguration"));
-            services.Configure<MailConfiguration>(configuration.GetSection("MailSettings"));
-            services.Configure<PaginationConfiguration>(configuration.GetSection("PaginationConfiguration"));
+            services.Configure<JWTSettings>(configuration.GetSection("JWTConfiguration"));
+            services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
+            services.Configure<PaginationSettings>(configuration.GetSection("PaginationConfiguration"));
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

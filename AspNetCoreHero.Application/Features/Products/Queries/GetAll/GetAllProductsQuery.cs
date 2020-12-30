@@ -3,7 +3,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetCoreHero.Application.Configurations;
+using AspNetCoreHero.Application.DTOs.Settings;
 using AspNetCoreHero.Application.Features.ProductCategories.Queries.GetAll;
 using AspNetCoreHero.Application.Interfaces.Repositories;
 using AspNetCoreHero.Application.Parameters;
@@ -26,17 +26,17 @@ namespace AspNetCoreHero.Application.Features.Products.Queries.GetAll
     {
         private readonly IProductRepositoryAsync _productRepository;
         private readonly IMapper _mapper;
-        private readonly PaginationConfiguration _paginationConfiguration;
-        public GetAllProductsQueryHandler(IProductRepositoryAsync productRepository, IMapper mapper, IOptions<PaginationConfiguration> paginationConfiguration)
+        private readonly PaginationSettings _paginationSettings;
+        public GetAllProductsQueryHandler(IProductRepositoryAsync productRepository, IMapper mapper, IOptions<PaginationSettings> paginationSettings)
         {
             _productRepository = productRepository;
             _mapper = mapper;
-            _paginationConfiguration = paginationConfiguration.Value;
+            _paginationSettings = paginationSettings.Value;
         }
 
         public async Task<PagedResponse<IEnumerable<GetAllProductsViewModel>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
-            var pageSize = request.PageSize < 1 ? _paginationConfiguration.PageSize : request.PageSize;
+            var pageSize = request.PageSize < 1 ? _paginationSettings.PageSize : request.PageSize;
             int totalRecords = await _productRepository.CountAsync();
             var validRequest = new RequestParameter(request.PageNumber, pageSize);
             if (request.PageNumber == 0) // get All

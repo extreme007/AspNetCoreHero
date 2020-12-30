@@ -1,7 +1,7 @@
-﻿using AspNetCoreHero.Application.Configurations;
-using AspNetCoreHero.Application.DTOs.Account;
+﻿using AspNetCoreHero.Application.DTOs.Account;
 using AspNetCoreHero.Application.DTOs.Mail;
-using AspNetCoreHero.Application.Enums.Identity;
+using AspNetCoreHero.Application.DTOs.Settings;
+using AspNetCoreHero.Application.Enums;
 using AspNetCoreHero.Application.Exceptions;
 using AspNetCoreHero.Application.Interfaces;
 using AspNetCoreHero.Application.Interfaces.Shared;
@@ -28,14 +28,14 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly JWTConfiguration _jwtSettings;
+        private readonly JWTSettings _jwtSettings;
         private readonly IMailService _mailService;
-        private readonly MailConfiguration _mailSettings;
+        private readonly MailSettings _mailSettings;
         public AccountService(UserManager<ApplicationUser> userManager,
-            IOptions<JWTConfiguration> jwtSettings,
+            IOptions<JWTSettings> jwtSettings,
             SignInManager<ApplicationUser> signInManager,
             IMailService mailService,
-            IOptions<MailConfiguration> mailSettings)
+            IOptions<MailSettings> mailSettings)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;

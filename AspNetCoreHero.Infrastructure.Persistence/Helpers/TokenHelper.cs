@@ -1,5 +1,5 @@
-﻿using AspNetCoreHero.Application.Configurations;
-using AspNetCoreHero.Application.DTOs.Account;
+﻿using AspNetCoreHero.Application.DTOs.Account;
+using AspNetCoreHero.Application.DTOs.Settings;
 using AspNetCoreHero.Infrastructure.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +16,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Helpers
 {
     public static class TokenHelper
     {
-        public async static Task<JwtSecurityToken> GenerateJWToken(ApplicationUser user, UserManager<ApplicationUser> userManager, JWTConfiguration jwtSettings)
+        public async static Task<JwtSecurityToken> GenerateJWToken(ApplicationUser user, UserManager<ApplicationUser> userManager, JWTSettings jwtSettings)
         {
             var userClaims = await userManager.GetClaimsAsync(user);
             var roles = await userManager.GetRolesAsync(user);

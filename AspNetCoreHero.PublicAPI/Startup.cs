@@ -39,6 +39,7 @@ namespace AspNetCoreHero.PublicAPI
             services.AddSwaggerService();
             services.AddControllers();
             services.AddPersistenceInfrastructureForApi(_configuration);
+            services.AddRepositories();
             services.AddHttpContextAccessor();
             services.AddHealthChecks();
             //For In-Memory Caching

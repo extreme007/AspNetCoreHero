@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AspNetCoreHero.Application.Configurations
+namespace AspNetCoreHero.Application.DTOs.Settings
 {
-    public class JWTConfiguration
+    public class JWTSettings
     {
         public string Key { get; set; }
         public string Issuer { get; set; }

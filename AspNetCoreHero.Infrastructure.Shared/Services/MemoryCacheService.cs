@@ -1,4 +1,4 @@
-﻿using AspNetCoreHero.Application.Configurations;
+﻿using AspNetCoreHero.Application.DTOs.Settings;
 using AspNetCoreHero.Application.Interfaces.Shared;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -9,10 +9,10 @@ namespace AspNetCoreHero.Infrastructure.Shared.Services
     public class MemoryCacheService : ICacheService
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly CacheConfiguration _cacheConfig;
+        private readonly CacheSettings _cacheConfig;
         private MemoryCacheEntryOptions _cacheOptions;
 
-        public MemoryCacheService(IMemoryCache memoryCache, IOptions<CacheConfiguration> cacheConfig)
+        public MemoryCacheService(IMemoryCache memoryCache, IOptions<CacheSettings> cacheConfig)
         {
             _memoryCache = memoryCache;
             _cacheConfig = cacheConfig.Value;

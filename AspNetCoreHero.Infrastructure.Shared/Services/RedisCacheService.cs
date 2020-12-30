@@ -1,5 +1,4 @@
-﻿using AspNetCoreHero.Application.Configurations;
-using AspNetCoreHero.Application.Interfaces.Shared;
+﻿using AspNetCoreHero.Application.Interfaces.Shared;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using System;

@@ -1,7 +1,7 @@
-﻿using AspNetCoreHero.Application.Configurations;
-using AspNetCoreHero.Application.DTOs.Account;
+﻿using AspNetCoreHero.Application.DTOs.Account;
 using AspNetCoreHero.Application.DTOs.ExternalAuth;
-using AspNetCoreHero.Application.Enums.Identity;
+using AspNetCoreHero.Application.DTOs.Settings;
+using AspNetCoreHero.Application.Enums;
 using AspNetCoreHero.Application.Exceptions;
 using AspNetCoreHero.Application.Interfaces;
 using AspNetCoreHero.Application.Wrappers;
@@ -25,10 +25,10 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
     public class ExternalAuthService : IExternalAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly JWTConfiguration _jwtSettings;
+        private readonly JWTSettings _jwtSettings;
 
         public ExternalAuthService(UserManager<ApplicationUser> userManager,
-        IOptions<JWTConfiguration> jwtSettings)
+        IOptions<JWTSettings> jwtSettings)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
