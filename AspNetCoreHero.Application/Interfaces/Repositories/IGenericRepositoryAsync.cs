@@ -20,8 +20,7 @@ namespace AspNetCoreHero.Application.Interfaces.Repositories
 
         T Update(T entity, object key);
         Task<T> UpdateAsync(T entity, object key);
-
-        void Delete(T entity);
+        Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
 
         int Count();

@@ -15,6 +15,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
             services.AddTransient(typeof(IGenericRepositoryAsync<>), typeof(GenericRepositoryAsync<>));
             services.AddTransient<IProductRepositoryAsync, ProductRepositoryAsync>();
             services.AddTransient<IProductCategoryRepositoryAsync, ProductCategoryRepositoryAsync>();
+            services.AddTransient<ILogRepository, LogRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             #endregion
         }

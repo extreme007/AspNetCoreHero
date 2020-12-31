@@ -48,9 +48,9 @@ namespace AspNetCoreHero.PublicAPI.Controllers.v1
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, bool Physical)
         {
-            return Ok(await _mediator.Send(new DeleteProductCategoryByIdCommand { Id = id }));
+            return Ok(await _mediator.Send(new DeleteProductCategoryByIdCommand { Id = id, Physical = Physical }));
         }
     }
 }

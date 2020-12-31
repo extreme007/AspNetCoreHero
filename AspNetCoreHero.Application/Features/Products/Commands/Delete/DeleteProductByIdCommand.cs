@@ -14,6 +14,7 @@ namespace AspNetCoreHero.Application.Features.Products.Commands.Delete
     public class DeleteProductByIdCommand : IRequest<Response<int>>
     {
         public int Id { get; set; }
+        public bool Physical { get; set; } = false;
         public class DeleteProductByIdCommandHandler : IRequestHandler<DeleteProductByIdCommand, Response<int>>
         {
             private readonly IProductRepositoryAsync _productRepository;
@@ -31,13 +32,15 @@ namespace AspNetCoreHero.Application.Features.Products.Commands.Delete
             {
                 var product = await _productRepository.GetByIdAsync(command.Id);
                 if (product == null) throw new ApiException($"Product Not Found.");
-                //await _productRepository.DeleteAsync(product);
-
-                //Update status IsDeleted
-                product.DeletedBy = _authenticatedUser.UserId;
-                product.DeletionTime = _dateTime.Now;
-                product.IsDeleted = true;
-                await _productRepository.UpdateAsync(product,command.Id);
+                if (command.Physical)
+                {
+                    await _productRepository.DeleteAsync(product);
+                }
+                else
+                {
+                    product.IsDeleted = true;
+                    await _productRepository.UpdateAsync(product);
+                }             
                 await _unitOfWork.Commit(cancellationToken);
                 return new Response<int>(product.Id);
             }

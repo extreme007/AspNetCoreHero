@@ -38,10 +38,10 @@ namespace AspNetCoreHero.Application.Features.ProductCategories.Commands.Update
                 {
                     category.Name = command.Name;
                     category.Tax = command.Tax;
-                    category.Description = command.Description;
-                    await _productCategoryRepository.UpdateAsync(category,command.Id);
+                    category.Description = command.Description; 
+                    await _productCategoryRepository.UpdateAsync(category);
                     var result = await _unitOfWork.Commit(cancellationToken);
-                    if(result > 0)
+                    if (result > 0)
                         return new Response<ProductCategory>(category);
                     return new Response<ProductCategory>(null);
                 }

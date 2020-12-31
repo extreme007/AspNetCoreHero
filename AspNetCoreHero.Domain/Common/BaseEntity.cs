@@ -4,9 +4,8 @@ using System.Text;
 
 namespace AspNetCoreHero.Domain.Common
 {
-    public abstract class EntityBase
+    public abstract class BaseEntity : IBaseEntity
     {
-        public virtual int Id { get; set; }
-        public bool IsDeleted { get; set; }
+        public int Id { get; set; }
     }
 }

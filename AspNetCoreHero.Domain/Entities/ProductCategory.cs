@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AspNetCoreHero.Domain.Entities
 {
-    public class ProductCategory : AuditableEntityBase
+    public class ProductCategory : AuditableBaseEntity
     {
         public string Name { get; set; }
         public string Description { get; set; }

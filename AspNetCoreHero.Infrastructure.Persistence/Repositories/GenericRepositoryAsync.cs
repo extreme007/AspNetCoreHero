@@ -61,12 +61,6 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             return await _dbContext.Set<T>().CountAsync();
         }
 
-        public void Delete(T entity)
-        {
-            _dbContext.Set<T>().Remove(entity);
-            //_cacheService(cacheTech).Remove(cacheKey);
-            BackgroundJob.Enqueue(() => RefreshCache());
-        }
 
         public Task DeleteAsync(T entity)
         {
@@ -194,13 +188,20 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
         {
             T exist = await _dbContext.Set<T>().FindAsync(key);
             if (exist != null)
-            {
+            {                
                 _dbContext.Entry(exist).CurrentValues.SetValues(entity);
                 _dbContext.Entry(entity).State = EntityState.Modified;
                 //_cacheService(cacheTech).Remove(cacheKey);
                 BackgroundJob.Enqueue(() => RefreshCache());
             }
             return exist;
+        }
+
+        public Task UpdateAsync(T entity)
+        {
+            _dbContext.Entry(entity).CurrentValues.SetValues(entity);
+            BackgroundJob.Enqueue(() => RefreshCache());
+            return Task.CompletedTask;
         }
 
         public IQueryable<T> QueryInclude(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = "")
@@ -348,6 +349,6 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             }
             string fullquery = query + pamameterString;
             return await _dbContext.Database.ExecuteSqlRawAsync(fullquery, parameters);
-        }
+        }      
     }
 }

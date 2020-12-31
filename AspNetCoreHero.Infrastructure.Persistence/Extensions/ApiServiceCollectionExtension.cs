@@ -1,5 +1,6 @@
 ﻿using AspNetCoreHero.Application.DTOs.Settings;
 using AspNetCoreHero.Application.Interfaces;
+using AspNetCoreHero.Application.Interfaces.Contexts;
 using AspNetCoreHero.Application.Interfaces.Repositories;
 using AspNetCoreHero.Application.Wrappers;
 using AspNetCoreHero.Infrastructure.Persistence.Contexts;
@@ -152,6 +153,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
                 }
 
             }
+
+            services.AddScoped<IApplicationDbContext, ApplicationContext>();
         }
     }
 }
