@@ -326,7 +326,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
                 }
             }
             string fullquery = query + pamameterString;
-            return _dbContext.Database.ExecuteSqlCommand(fullquery, parameters);
+            return _dbContext.Database.ExecuteSqlRaw(fullquery, parameters);
         }
 
         public async Task<int> ExecWithStoreProcedureCommandAsync(string query, params object[] parameters)
@@ -347,7 +347,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
                 }
             }
             string fullquery = query + pamameterString;
-            return await _dbContext.Database.ExecuteSqlCommandAsync(fullquery, parameters);
+            return await _dbContext.Database.ExecuteSqlRawAsync(fullquery, parameters);
         }
     }
 }
