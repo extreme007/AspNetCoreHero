@@ -19,7 +19,7 @@ namespace AspNetCoreHero.PublicAPI
         {
             //Read Configuration from appSettings
             var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", 
+                .AddJsonFile("appsettings.json",
                     optional: true,
                     reloadOnChange: true)
                 .Build();
@@ -34,9 +34,9 @@ namespace AspNetCoreHero.PublicAPI
             using (var scope = host.Services.CreateScope())
             {
                 //_logger.LogInformation("Loading Application");
-                Log.Information("Loading Application");
+                //Log.Information("Loading Application");
                 var services = scope.ServiceProvider;
-                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+                //var loggerFactory = services.GetRequiredService<ILoggerFactory>();
                 try
                 {
                     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
@@ -45,17 +45,17 @@ namespace AspNetCoreHero.PublicAPI
 
                     //_logger.LogInformation("Finished Seeding Default Data");
                     //_logger.LogInformation("Application Starting");
-                    Log.Information("Finished Seeding Default Data");
-                    Log.Information("Application Starting");
+                    //Log.Information("Finished Seeding Default Data");
+                    //Log.Information("Application Starting");
                 }
                 catch (Exception ex)
                 {
                     //_logger.LogWarning(ex, "An error occurred seeding the DB");
-                    Log.Warning(ex, "An error occurred seeding the DB");
+                    //Log.Warning(ex, "An error occurred seeding the DB");
                 }
                 finally
                 {
-                    Log.CloseAndFlush();
+                    //Log.CloseAndFlush();
                 }
             }
             host.Run();

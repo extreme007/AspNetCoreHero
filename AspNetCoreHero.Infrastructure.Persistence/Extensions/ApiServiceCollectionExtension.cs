@@ -56,7 +56,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
             services.AddTransient<IExternalAuthService, ExternalAuthService>();
             services.AddTransient<IAccountService, AccountService>();
             #endregion
-            services.Configure<JWTSettings>(configuration.GetSection("JWTConfiguration"));
+            services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
             services.Configure<PaginationSettings>(configuration.GetSection("PaginationConfiguration"));
             services.AddAuthentication(options =>
@@ -74,9 +74,9 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
                        ValidateAudience = true,
                        ValidateLifetime = true,
                        ClockSkew = TimeSpan.Zero,
-                       ValidIssuer = configuration["JWTConfiguration:Issuer"],
-                       ValidAudience = configuration["JWTConfiguration:Audience"],
-                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTConfiguration:Key"]))
+                       ValidIssuer = configuration["JWTSettings:Issuer"],
+                       ValidAudience = configuration["JWTSettings:Audience"],
+                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTSettings:Key"]))
                    };
                    //o.Events = new JwtBearerEvents()
                    //{
