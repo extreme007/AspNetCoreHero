@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AspNetCoreHero.Application.DTOs.Account;
 using AspNetCoreHero.Application.Interfaces;
@@ -26,8 +24,8 @@ namespace AspNetCoreHero.PublicAPI.Controllers
         public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
         {
             var result = await _accountService.AuthenticateAsync(request, GenerateIPAddress());
-            var data = result.Data;
-            SetTokenInCookie(data.RefreshToken, data.AccessToken);
+            
+            SetTokenInCookie(result?.Data?.RefreshToken, result?.Data?.AccessToken);
             return Ok(result);
         }
 
@@ -56,7 +54,6 @@ namespace AspNetCoreHero.PublicAPI.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest model)
         {
-
             return Ok(await _accountService.ResetPassword(model));
         }
 
@@ -100,7 +97,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires = DateTime.UtcNow.AddDays(10),
+                Expires = DateTime.UtcNow.AddDays(7),
                 //SameSite = SameSiteMode.None
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);

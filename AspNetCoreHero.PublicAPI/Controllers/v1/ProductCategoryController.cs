@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AspNetCoreHero.Application.Features.ProductCategories.Commands.Create;
 using AspNetCoreHero.Application.Features.ProductCategories.Commands.Delete;
 using AspNetCoreHero.Application.Features.ProductCategories.Commands.Update;
