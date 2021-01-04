@@ -76,6 +76,13 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
                             break;
                     }
                 }
+
+                //var existedIsDeleted = auditEntry.ChangedColumns.Any(x => x.Contains("IsDeleted"));
+                //if(existedIsDeleted)
+                //{
+                //    auditEntry.AuditType = AuditType.SDelete;
+                //}    
+             
             }
             foreach (var auditEntry in auditEntries.Where(_ => !_.HasTemporaryProperties))
             {

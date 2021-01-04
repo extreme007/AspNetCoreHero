@@ -23,7 +23,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options, IDateTimeService dateTime, IAuthenticatedUserService authenticatedUser) : base(options)
         {
-            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll; // Update 09/12/2020
+            //ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
             _dateTime = dateTime;
             _authenticatedUser = authenticatedUser;
         }
