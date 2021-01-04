@@ -15,19 +15,19 @@ namespace AspNetCoreHero.Infrastructure.Shared.Services
         private readonly CacheSettings _cacheConfig;
         private DistributedCacheEntryOptions _cacheOptions;
 
-        public RedisCacheService(IDistributedCache redisCache, IOptions<CacheSettings> cacheConfig)
-        {
-            //_redisCache = redisCache;
-            //_cacheConfig = cacheConfig.Value;
-            //if (_cacheConfig != null)
-            //{
-            //    _cacheOptions = new DistributedCacheEntryOptions
-            //    {
-            //        AbsoluteExpiration = DateTime.Now.AddHours(_cacheConfig.AbsoluteExpirationInHours),
-            //        SlidingExpiration = TimeSpan.FromMinutes(_cacheConfig.SlidingExpirationInMinutes)
-            //    };
-            //}
-        }
+        //public RedisCacheService(IDistributedCache redisCache, IOptions<CacheSettings> cacheConfig)
+        //{
+        //    _redisCache = redisCache;
+        //    _cacheConfig = cacheConfig.Value;
+        //    if (_cacheConfig != null)
+        //    {
+        //        _cacheOptions = new DistributedCacheEntryOptions
+        //        {
+        //            AbsoluteExpiration = DateTime.Now.AddHours(_cacheConfig.AbsoluteExpirationInHours),
+        //            SlidingExpiration = TimeSpan.FromMinutes(_cacheConfig.SlidingExpirationInMinutes)
+        //        };
+        //    }
+        //}
         public void Remove(string cacheKey)
         {
             throw new NotImplementedException();
