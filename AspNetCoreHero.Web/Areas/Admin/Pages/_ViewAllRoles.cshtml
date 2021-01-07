@@ -1,0 +1,72 @@
+﻿@using AspNetCoreHero.Web.Areas.Admin.ViewModels
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+@model IEnumerable<RolesViewModel>
+<table class="table table-striped" id="rolesTable">
+    <thead>
+        <tr>
+            <th>
+                @localizer["Role"]
+            </th>
+            <th>
+                @localizer["Id"]
+            </th>
+
+            @if (User.Claims.Any(a => a.Value == MasterPermissions.Update || a.Value == ProductPermissions.Update || a.Value == MasterPermissions.Delete || a.Value == ProductPermissions.Delete))
+            {
+                <th style="width:10%">
+                    @localizer["Actions"]
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var role in Model)
+        {
+            <tr>
+                <td>
+                    @role.Name
+                </td>
+                <td>
+                    @role.Id
+                </td>
+                <td text-right">
+                    @if (User.Claims.Any(a => a.Value == MasterPermissions.Update || a.Value == MasterPermissions.Delete) && role.Name != "SuperAdmin")
+                    {
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Action
+                            </button>
+                            <div class="dropdown-menu shadow animated--grow-in">
+                                @if (User.Claims.Any(a => a.Value == MasterPermissions.Update) && role.Name != "SuperAdmin" && role.Name != "Basic")
+                                {
+                                    <a onclick="jQueryModalGet('/admin/roles?handler=CreateOrEdit&id=@role.Id','Edit Role')" class="dropdown-item">
+                                        <i class="fas fa-pencil-alt"></i> @localizer["Edit"]
+                                    </a>
+                                }
+                                @if (User.Claims.Any(a => a.Value == MasterPermissions.Delete) && role.Name != "SuperAdmin" && role.Name != "Basic")
+                                {
+                                    <form id="form_delete_@role.Id" asp-page="Roles" method="post" asp-page-handler="Delete" asp-route-id="@role.Id" onsubmit="return jQueryModalDelete(this)" class="d-inline">
+                                        <a href="javascript:$('#form_delete_@role.Id').submit();" class="dropdown-item"><i class="fas fa-trash-alt"></i> @localizer["Delete"]</a>
+                                    </form>
+                                }
+                                @if (role.Name != "SuperAdmin")
+                                {
+                                    <a asp-area="Admin" asp-page="Claims" asp-route-roleId="@role.Id" asp-page-handler="ViewAll" class="dropdown-item">
+                                        <i class="fas fa-lock"></i> @localizer["Permissions"]
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        $("#rolesTable").DataTable();
+    });
+</script>

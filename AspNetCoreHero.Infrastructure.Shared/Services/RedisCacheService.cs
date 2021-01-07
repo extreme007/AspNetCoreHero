@@ -11,9 +11,9 @@ namespace AspNetCoreHero.Infrastructure.Shared.Services
 {
     public class RedisCacheService : ICacheService
     {
-        private readonly IDistributedCache _redisCache;
-        private readonly CacheSettings _cacheConfig;
-        private DistributedCacheEntryOptions _cacheOptions;
+        //private readonly IDistributedCache _redisCache;
+        //private readonly CacheSettings _cacheConfig;
+        //private DistributedCacheEntryOptions _cacheOptions;
 
         //public RedisCacheService(IDistributedCache redisCache, IOptions<CacheSettings> cacheConfig)
         //{

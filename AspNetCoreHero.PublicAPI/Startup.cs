@@ -48,7 +48,7 @@ namespace AspNetCoreHero.PublicAPI
 
             //Hangfire
             services.AddHangfire(_configuration);
-          
+
 
             services.Configure<FormOptions>(o => {
                 o.ValueLengthLimit = int.MaxValue;
@@ -79,7 +79,7 @@ namespace AspNetCoreHero.PublicAPI
                 endpoints.MapControllers();
             });
 
-            app.UseStaticFiles();
+            //app.UseStaticFiles();
             app.UseStaticFiles(new StaticFileOptions()
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),

@@ -28,6 +28,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreHero.Infrastructu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreHero.Hangfire", "AspNetCoreHero.Hangfire\AspNetCoreHero.Hangfire.csproj", "{8AEFB76E-5A20-48E0-AC1F-29742923F0E3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCoreHero.Web", "AspNetCoreHero.Web\AspNetCoreHero.Web.csproj", "{13EE58A4-B635-4199-9CD5-6F297E37D753}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{8AEFB76E-5A20-48E0-AC1F-29742923F0E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AEFB76E-5A20-48E0-AC1F-29742923F0E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AEFB76E-5A20-48E0-AC1F-29742923F0E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13EE58A4-B635-4199-9CD5-6F297E37D753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13EE58A4-B635-4199-9CD5-6F297E37D753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13EE58A4-B635-4199-9CD5-6F297E37D753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13EE58A4-B635-4199-9CD5-6F297E37D753}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +77,7 @@ Global
 		{55CD808F-70D4-46B5-B5E4-1C79D4011F42} = {79415484-52E5-4602-A74E-15E16B1E9363}
 		{589A7958-C39E-49D3-9152-268F98120D5A} = {79415484-52E5-4602-A74E-15E16B1E9363}
 		{8AEFB76E-5A20-48E0-AC1F-29742923F0E3} = {D98D19B9-7DE0-4304-8F6C-7D54A86E2BFC}
+		{13EE58A4-B635-4199-9CD5-6F297E37D753} = {D98D19B9-7DE0-4304-8F6C-7D54A86E2BFC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B051C5E6-3903-45C8-8524-DB878ADA5297}

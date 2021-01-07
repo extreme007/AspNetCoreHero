@@ -1,0 +1,172 @@
+2021-01-07 14:56:33.987 +07:00 [INF] Now listening on: https://localhost:5001
+2021-01-07 14:56:34.041 +07:00 [INF] Now listening on: http://localhost:5000
+2021-01-07 14:56:34.044 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2021-01-07 14:56:34.047 +07:00 [INF] Hosting environment: Development
+2021-01-07 14:56:34.050 +07:00 [INF] Content root path: D:\An\AspNetCoreHero\AspNetCoreHero.Web
+2021-01-07 14:57:22.190 +07:00 [ERR] Connection id "0HM5IS70ABIJL", Request id "0HM5IS70ABIJL:0000003F": An unhandled exception was thrown by the application.
+System.InvalidOperationException: JobStorage.Current property value has not been initialized. You must set it before using Hangfire Client or Server API.
+   at Hangfire.JobStorage.get_Current()
+   at Hangfire.BackgroundJobClient..ctor()
+   at Hangfire.BackgroundJob.<>c.<.cctor>b__45_0()
+   at System.Lazy`1.PublicationOnlyViaFactory(LazyHelper initializer)
+   at System.Lazy`1.CreateValue()
+   at Hangfire.BackgroundJob.<>c.<.cctor>b__45_1()
+   at Hangfire.BackgroundJob.Enqueue(Expression`1 methodCall)
+   at AspNetCoreHero.Infrastructure.Persistence.Repositories.GenericRepositoryAsync`1.AddAsync(T entity) in D:\An\AspNetCoreHero\AspNetCoreHero.Infrastructure.Persistence\Repositories\GenericRepositoryAsync.cs:line 50
+   at AspNetCoreHero.Application.Features.ProductCategories.Commands.Create.CreateProductCategoryCommandHandler.Handle(CreateProductCategoryCommand request, CancellationToken cancellationToken) in D:\An\AspNetCoreHero\AspNetCoreHero.Application\Features\ProductCategories\Commands\Create\CreateProductCategoryCommand.cs:line 36
+   at AspNetCoreHero.Application.Behaviours.ValidationBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next) in D:\An\AspNetCoreHero\AspNetCoreHero.Application\Behaviours\ValidationBehavior.cs:line 33
+   at MediatR.Pipeline.RequestExceptionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestExceptionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestExceptionActionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestExceptionActionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestPostProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestPreProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at AspNetCoreHero.Web.Areas.ProductCategories.Pages.IndexModel.OnPostCreateOrEditAsync(Int32 id, ProductCategoryViewModel product) in D:\An\AspNetCoreHero\AspNetCoreHero.Web\Areas\ProductCategories\Pages\Index.cshtml.cs:line 65
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ExecutorFactory.GenericTaskHandlerMethod.Convert[T](Object taskAsObject)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ExecutorFactory.GenericTaskHandlerMethod.Execute(Object receiver, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.InvokeHandlerMethodAsync()
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.InvokeNextPageFilterAsync()
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.Rethrow(PageHandlerExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.InvokeInnerFilterAsync()
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|24_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.StatusCodePagesMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Localization.RequestLocalizationMiddleware.Invoke(HttpContext context)
+   at NToastNotify.NtoastNotifyAjaxToastsMiddleware.InvokeAsync(HttpContext context, RequestDelegate next)
+   at Microsoft.AspNetCore.Builder.UseMiddlewareExtensions.<>c__DisplayClass6_1.<<UseMiddlewareInterface>b__1>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+2021-01-07 14:57:23.353 +07:00 [ERR] Connection id "0HM5IS70ABIJL", Request id "0HM5IS70ABIJL:00000041": An unhandled exception was thrown by the application.
+System.InvalidOperationException: JobStorage.Current property value has not been initialized. You must set it before using Hangfire Client or Server API.
+   at Hangfire.JobStorage.get_Current()
+   at Hangfire.BackgroundJobClient..ctor()
+   at Hangfire.BackgroundJob.<>c.<.cctor>b__45_0()
+   at System.Lazy`1.PublicationOnlyViaFactory(LazyHelper initializer)
+   at System.Lazy`1.CreateValue()
+   at Hangfire.BackgroundJob.<>c.<.cctor>b__45_1()
+   at Hangfire.BackgroundJob.Enqueue(Expression`1 methodCall)
+   at AspNetCoreHero.Infrastructure.Persistence.Repositories.GenericRepositoryAsync`1.AddAsync(T entity) in D:\An\AspNetCoreHero\AspNetCoreHero.Infrastructure.Persistence\Repositories\GenericRepositoryAsync.cs:line 50
+   at AspNetCoreHero.Application.Features.ProductCategories.Commands.Create.CreateProductCategoryCommandHandler.Handle(CreateProductCategoryCommand request, CancellationToken cancellationToken) in D:\An\AspNetCoreHero\AspNetCoreHero.Application\Features\ProductCategories\Commands\Create\CreateProductCategoryCommand.cs:line 36
+   at AspNetCoreHero.Application.Behaviours.ValidationBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next) in D:\An\AspNetCoreHero\AspNetCoreHero.Application\Behaviours\ValidationBehavior.cs:line 33
+   at MediatR.Pipeline.RequestExceptionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestExceptionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestExceptionActionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestExceptionActionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestPostProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestPreProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at AspNetCoreHero.Web.Areas.ProductCategories.Pages.IndexModel.OnPostCreateOrEditAsync(Int32 id, ProductCategoryViewModel product) in D:\An\AspNetCoreHero\AspNetCoreHero.Web\Areas\ProductCategories\Pages\Index.cshtml.cs:line 65
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ExecutorFactory.GenericTaskHandlerMethod.Convert[T](Object taskAsObject)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ExecutorFactory.GenericTaskHandlerMethod.Execute(Object receiver, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.InvokeHandlerMethodAsync()
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.InvokeNextPageFilterAsync()
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.Rethrow(PageHandlerExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.InvokeInnerFilterAsync()
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|24_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.StatusCodePagesMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Localization.RequestLocalizationMiddleware.Invoke(HttpContext context)
+   at NToastNotify.NtoastNotifyAjaxToastsMiddleware.InvokeAsync(HttpContext context, RequestDelegate next)
+   at Microsoft.AspNetCore.Builder.UseMiddlewareExtensions.<>c__DisplayClass6_1.<<UseMiddlewareInterface>b__1>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+2021-01-07 15:04:32.717 +07:00 [INF] Now listening on: https://localhost:5001
+2021-01-07 15:04:32.776 +07:00 [INF] Now listening on: http://localhost:5000
+2021-01-07 15:04:32.779 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2021-01-07 15:04:32.781 +07:00 [INF] Hosting environment: Development
+2021-01-07 15:04:32.783 +07:00 [INF] Content root path: D:\An\AspNetCoreHero\AspNetCoreHero.Web
+2021-01-07 15:05:00.055 +07:00 [INF] Setting response header Access-Control-Expose-Headers with X-NToastNotify-Messages
+2021-01-07 15:05:00.059 +07:00 [INF] Setting response header X-NToastNotify-Messages with [{"message":"Product Created.","options":{"title":"Success","type":"success"}}]
+2021-01-07 15:05:08.429 +07:00 [INF] JobStorage.Current property value has not been initialized. You must set it before using Hangfire Client or Server API.
+2021-01-07 15:05:08.603 +07:00 [ERR] Connection id "0HM5ISBF1S7KE", Request id "0HM5ISBF1S7KE:00000039": An unhandled exception was thrown by the application.
+System.InvalidOperationException: JobStorage.Current property value has not been initialized. You must set it before using Hangfire Client or Server API.
+   at Hangfire.JobStorage.get_Current()
+   at Hangfire.BackgroundJobClient..ctor()
+   at Hangfire.BackgroundJob.<>c.<.cctor>b__45_0()
+   at System.Lazy`1.PublicationOnlyViaFactory(LazyHelper initializer)
+   at System.Lazy`1.CreateValue()
+   at Hangfire.BackgroundJob.<>c.<.cctor>b__45_1()
+   at Hangfire.BackgroundJob.Enqueue(Expression`1 methodCall)
+   at AspNetCoreHero.Infrastructure.Persistence.Repositories.GenericRepositoryAsync`1.UpdateAsync(T entity) in D:\An\AspNetCoreHero\AspNetCoreHero.Infrastructure.Persistence\Repositories\GenericRepositoryAsync.cs:line 203
+   at AspNetCoreHero.Application.Features.ProductCategories.Commands.Update.UpdateProductCategoryCommand.UpdateProductCategoryCommandHandler.Handle(UpdateProductCategoryCommand command, CancellationToken cancellationToken) in D:\An\AspNetCoreHero\AspNetCoreHero.Application\Features\ProductCategories\Commands\Update\UpdateProductCategoryCommand.cs:line 42
+   at AspNetCoreHero.Application.Behaviours.ValidationBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next) in D:\An\AspNetCoreHero\AspNetCoreHero.Application\Behaviours\ValidationBehavior.cs:line 33
+   at MediatR.Pipeline.RequestExceptionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestExceptionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestExceptionActionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestExceptionActionProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestPostProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at MediatR.Pipeline.RequestPreProcessorBehavior`2.Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate`1 next)
+   at AspNetCoreHero.Web.Areas.ProductCategories.Pages.IndexModel.OnPostCreateOrEditAsync(Int32 id, ProductCategoryViewModel product) in D:\An\AspNetCoreHero\AspNetCoreHero.Web\Areas\ProductCategories\Pages\Index.cshtml.cs:line 75
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ExecutorFactory.GenericTaskHandlerMethod.Convert[T](Object taskAsObject)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ExecutorFactory.GenericTaskHandlerMethod.Execute(Object receiver, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.InvokeHandlerMethodAsync()
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.InvokeNextPageFilterAsync()
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.Rethrow(PageHandlerExecutedContext context)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageActionInvoker.InvokeInnerFilterAsync()
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|24_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|19_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.StatusCodePagesMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Localization.RequestLocalizationMiddleware.Invoke(HttpContext context)
+   at NToastNotify.NtoastNotifyAjaxToastsMiddleware.InvokeAsync(HttpContext context, RequestDelegate next)
+   at Microsoft.AspNetCore.Builder.UseMiddlewareExtensions.<>c__DisplayClass6_1.<<UseMiddlewareInterface>b__1>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+2021-01-07 15:27:13.867 +07:00 [INF] Now listening on: https://localhost:5001
+2021-01-07 15:27:13.918 +07:00 [INF] Now listening on: http://localhost:5000
+2021-01-07 15:27:13.921 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2021-01-07 15:27:13.922 +07:00 [INF] Hosting environment: Development
+2021-01-07 15:27:13.924 +07:00 [INF] Content root path: D:\An\AspNetCoreHero\AspNetCoreHero.Web
+2021-01-07 15:35:33.657 +07:00 [INF] Server hcm-kcn-010:38964:3c4e1d95 successfully announced in 340.2786 ms
+2021-01-07 15:35:33.723 +07:00 [INF] Server hcm-kcn-010:38964:3c4e1d95 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2021-01-07 15:35:33.743 +07:00 [INF] 1 servers were removed due to timeout
+2021-01-07 15:35:33.850 +07:00 [INF] Server hcm-kcn-010:38964:3c4e1d95 all the dispatchers started
+2021-01-07 15:35:34.246 +07:00 [INF] Now listening on: https://localhost:5001
+2021-01-07 15:35:34.250 +07:00 [INF] Now listening on: http://localhost:5000
+2021-01-07 15:35:34.255 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2021-01-07 15:35:34.258 +07:00 [INF] Hosting environment: Development
+2021-01-07 15:35:34.261 +07:00 [INF] Content root path: D:\An\AspNetCoreHero\AspNetCoreHero.Web
+2021-01-07 15:36:05.041 +07:00 [INF] Setting response header Access-Control-Expose-Headers with X-NToastNotify-Messages
+2021-01-07 15:36:05.045 +07:00 [INF] Setting response header X-NToastNotify-Messages with [{"message":"Product Created.","options":{"title":"Success","type":"success"}}]
+2021-01-07 15:36:13.200 +07:00 [INF] Setting response header Access-Control-Expose-Headers with X-NToastNotify-Messages
+2021-01-07 15:36:13.202 +07:00 [INF] Setting response header X-NToastNotify-Messages with [{"message":"Product Updated.","options":{"title":"Success","type":"success"}}]
+2021-01-07 15:53:08.906 +07:00 [INF] Server hcm-kcn-010:38920:b120e38a successfully announced in 278.3087 ms
+2021-01-07 15:53:08.988 +07:00 [INF] Server hcm-kcn-010:38920:b120e38a is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2021-01-07 15:53:09.030 +07:00 [INF] 1 servers were removed due to timeout
+2021-01-07 15:53:09.134 +07:00 [INF] Server hcm-kcn-010:38920:b120e38a all the dispatchers started
+2021-01-07 15:53:09.743 +07:00 [INF] Now listening on: https://localhost:5001
+2021-01-07 15:53:09.746 +07:00 [INF] Now listening on: http://localhost:5000
+2021-01-07 15:53:09.749 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2021-01-07 15:53:09.753 +07:00 [INF] Hosting environment: Development
+2021-01-07 15:53:09.755 +07:00 [INF] Content root path: D:\An\AspNetCoreHero\AspNetCoreHero.Web
+2021-01-07 15:53:19.791 +07:00 [INF] Setting response header Access-Control-Expose-Headers with X-NToastNotify-Messages
+2021-01-07 15:53:19.798 +07:00 [INF] Setting response header X-NToastNotify-Messages with [{"message":"Product Updated.","options":{"title":"Success","type":"success"}}]
+2021-01-07 15:53:26.903 +07:00 [INF] Setting response header Access-Control-Expose-Headers with X-NToastNotify-Messages
+2021-01-07 15:53:26.906 +07:00 [INF] Setting response header X-NToastNotify-Messages with [{"message":"Product Updated.","options":{"title":"Success","type":"success"}}]
+2021-01-07 15:53:44.146 +07:00 [INF] Setting response header Access-Control-Expose-Headers with X-NToastNotify-Messages
+2021-01-07 15:53:44.149 +07:00 [INF] Setting response header X-NToastNotify-Messages with [{"message":"Product Updated.","options":{"title":"Success","type":"success"}}]
+2021-01-07 15:54:01.757 +07:00 [INF] Setting response header Access-Control-Expose-Headers with X-NToastNotify-Messages
+2021-01-07 15:54:01.759 +07:00 [INF] Setting response header X-NToastNotify-Messages with [{"message":"Product Updated.","options":{"title":"Success","type":"success"}}]
+2021-01-07 15:54:10.146 +07:00 [INF] Setting response header Access-Control-Expose-Headers with X-NToastNotify-Messages
+2021-01-07 15:54:10.149 +07:00 [INF] Setting response header X-NToastNotify-Messages with [{"message":"Product Updated.","options":{"title":"Success","type":"success"}}]
