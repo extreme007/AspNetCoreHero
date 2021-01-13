@@ -19,33 +19,33 @@ namespace AspNetCoreHero.PublicAPI.Filter
         }
         public bool Authorize(DashboardContext context)
         {
-            //#if DEBUG
-            //            // If we are in debug, always allow Hangfire access.
-            //            return true;
-            //#else
-            //            var httpContext = context.GetHttpContext();
-            //            var accessTokenHangfire = httpContext.Request.Cookies["accessTokenHangfire"];
-            //            if (!string.IsNullOrEmpty(accessTokenHangfire))
-            //            {
-            //                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            //                JwtSecurityToken securityToken = handler.ReadToken(accessTokenHangfire) as JwtSecurityToken;
-            //                bool result = securityToken.Claims.Where(claim => claim.Type == "roles").Select(x=>x.Value).Contains(_role);
-            //                return result;                
-            //            }
-            //            return false;            
-            //#endif
+#if DEBUG
+            // If we are in debug, always allow Hangfire access.
+            return true;
+#else
+                        var httpContext = context.GetHttpContext();
+                        var accessTokenHangfire = httpContext.Request.Cookies["accessTokenHangfire"];
+                        if (!string.IsNullOrEmpty(accessTokenHangfire))
+                        {
+                            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                            JwtSecurityToken securityToken = handler.ReadToken(accessTokenHangfire) as JwtSecurityToken;
+                            bool result = securityToken.Claims.Where(claim => claim.Type == "roles").Select(x=>x.Value).Contains(_role);
+                            return result;                
+                        }
+                        return false;            
+#endif
 
 
-            var httpContext = context.GetHttpContext();
-            var accessTokenHangfire = httpContext.Request.Cookies["accessTokenHangfire"];
-            if (!string.IsNullOrEmpty(accessTokenHangfire))
-            {
-                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-                JwtSecurityToken securityToken = handler.ReadToken(accessTokenHangfire) as JwtSecurityToken;
-                bool result = securityToken.Claims.Where(claim => claim.Type == "roles").Select(x => x.Value).Contains(_role);
-                return result;
-            }
-            return false;
+            //var httpContext = context.GetHttpContext();
+            //var accessTokenHangfire = httpContext.Request.Cookies["accessTokenHangfire"];
+            //if (!string.IsNullOrEmpty(accessTokenHangfire))
+            //{
+            //    JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            //    JwtSecurityToken securityToken = handler.ReadToken(accessTokenHangfire) as JwtSecurityToken;
+            //    bool result = securityToken.Claims.Where(claim => claim.Type == "roles").Select(x => x.Value).Contains(_role);
+            //    return result;
+            //}
+            //return false;
         }
     }
 }

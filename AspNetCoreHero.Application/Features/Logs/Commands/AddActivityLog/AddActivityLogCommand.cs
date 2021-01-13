@@ -12,7 +12,7 @@ namespace AspNetCoreHero.Application.Features.Logs.Commands.AddActivityLog
     public partial class AddActivityLogCommand : IRequest<Response<int>>
     {
         public string Action { get; set; }
-        public string userId { get; set; }
+        public string UserId { get; set; }
     }
     public class AddActivityLogCommandHandler : IRequestHandler<AddActivityLogCommand, Response<int>>
     {
@@ -28,7 +28,7 @@ namespace AspNetCoreHero.Application.Features.Logs.Commands.AddActivityLog
 
         public async Task<Response<int>> Handle(AddActivityLogCommand request, CancellationToken cancellationToken)
         {
-            await _logRepository.AddLogAsync(request.Action, request.userId);
+            await _logRepository.AddLogAsync(request.Action, request.UserId);
             var result = await _unitOfWork.Commit(cancellationToken);
             if (result > 0)
                 return new Response<int>(result);

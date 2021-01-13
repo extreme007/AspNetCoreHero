@@ -24,15 +24,17 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             _dateTimeService = dateTimeService;
         }
 
-        public async Task AddLogAsync(string action, string userId)
+        public async Task AddLogAsync(string action, string userId,string IpAddress)
         {
             var audit = new Audit()
             {
                 Type = action,
                 UserId = userId,
-                DateTime = _dateTimeService.NowUtc
+                DateTime = _dateTimeService.NowUtc,
+                IpAddress = IpAddress
             };
             await _repository.AddAsync(audit);
+
         }
 
         public async Task<List<AuditLogResponse>> GetAuditLogsAsync(string userId)

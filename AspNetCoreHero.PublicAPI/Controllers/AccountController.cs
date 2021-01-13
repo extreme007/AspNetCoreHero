@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AspNetCoreHero.Application.DTOs.Account;
+using AspNetCoreHero.Application.Enums;
 using AspNetCoreHero.Application.Interfaces;
+using AspNetCoreHero.Application.Interfaces.Repositories;
 using AspNetCoreHero.Application.Wrappers;
+using AspNetCoreHero.Infrastructure.Persistence.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,18 +17,25 @@ namespace AspNetCoreHero.PublicAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        public AccountController(IAccountService accountService)
+        private readonly ILogRepository _logService;
+        private readonly IUnitOfWork _unitOfWork;
+        public AccountController(IAccountService accountService,ILogRepository logRepository,IUnitOfWork unitOfWork)
         {
             _accountService = accountService;
+            _logService = logRepository;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpPost("authenticate")]
         [AllowAnonymous]
         public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
         {
-            var result = await _accountService.AuthenticateAsync(request, GenerateIPAddress());
-            
+            var ipAddress = IPHelper.GetIpAddress();
+            var result = await _accountService.AuthenticateAsync(request, ipAddress);
             SetTokenInCookie(result?.Data?.RefreshToken, result?.Data?.AccessToken);
+            //Add auditLog
+            await _logService.AddLogAsync(AuditType.Login.ToString(), result.Data.Id, ipAddress);
+            await _unitOfWork.Commit(default);
             return Ok(result);
         }
 
@@ -61,7 +71,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers
         public async Task<IActionResult> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            var response = await _accountService.RefreshTokenAsync(refreshToken, GenerateIPAddress());
+            var response = await _accountService.RefreshTokenAsync(refreshToken, IPHelper.GetIpAddress());
             if (!string.IsNullOrEmpty(response.Data.RefreshToken))
                 SetTokenInCookie(response.Data.RefreshToken);
             return Ok(response);

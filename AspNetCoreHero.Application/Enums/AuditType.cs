@@ -10,6 +10,7 @@ namespace AspNetCoreHero.Application.Enums
         Create = 1,
         Update = 2,
         Delete = 3,
-        SDelete = 4
+        Login = 4,
+        Logout = 5,
     }
 }
