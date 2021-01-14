@@ -4,41 +4,43 @@ using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Infrastructure.Persistence.Contexts;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
 {
     public class GenericRepositoryAsync<T> : IGenericRepositoryAsync<T> where T : class
     {
-        private readonly static CacheTech cacheTech = CacheTech.Memory;
         private readonly string cacheKey = $"{typeof(T)}";
         private readonly ApplicationContext _dbContext;
-        private readonly Func<CacheTech, ICacheService> _cacheService;
-        //private DbSet<T> dbSet;
+        private readonly IDistributedCache _distributedCache;
 
-        public GenericRepositoryAsync(ApplicationContext dbContext, Func<CacheTech, ICacheService> cacheService)
+        public GenericRepositoryAsync(ApplicationContext dbContext, IDistributedCache distributedCache)
         {
             _dbContext = dbContext;
-            _cacheService = cacheService;
-            //dbSet = _dbContext.Set<T>();
+            _distributedCache = distributedCache;
         }
+
+        public IQueryable<T> Entities => _dbContext.Set<T>();
 
         public async Task RefreshCache()
         {
-            _cacheService(cacheTech).Remove(cacheKey);
-            var cachedList = await _dbContext.Set<T>().ToListAsync();
-            _cacheService(cacheTech).Set(cacheKey, cachedList);
+            await _distributedCache.RemoveAsync(cacheKey);
+            var cachedList = await Entities.ToListAsync();
+            var encodedResult = JsonConvert.SerializeObject(cachedList);
+            await _distributedCache.SetStringAsync(cacheKey, encodedResult);
         }
 
         public T Add(T entity)
         {
             _dbContext.Set<T>().Add(entity);
-            //_cacheService(cacheTech).Remove(cacheKey);
             BackgroundJob.Enqueue(() => RefreshCache());
             return entity;
         }
@@ -46,119 +48,121 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
         public async Task<T> AddAsync(T entity)
         {
             await _dbContext.Set<T>().AddAsync(entity);
-            //_cacheService(cacheTech).Remove(cacheKey);
             BackgroundJob.Enqueue(() => RefreshCache());
             return entity;
         }
 
         public int Count()
         {
-            return _dbContext.Set<T>().Count();
+            return Entities.Count();
         }
 
         public async Task<int> CountAsync()
         {
-            return await _dbContext.Set<T>().CountAsync();
+            return await Entities.CountAsync();
         }
 
 
         public Task DeleteAsync(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
-            //_cacheService(cacheTech).Remove(cacheKey);
             BackgroundJob.Enqueue(() => RefreshCache());
             return Task.CompletedTask;
         }
 
         public T Find(Expression<Func<T, bool>> match)
         {
-            return _dbContext.Set<T>().SingleOrDefault(match);
+            return Entities.SingleOrDefault(match);
         }
 
         public async Task<T> FindAsync(Expression<Func<T, bool>> match)
         {
-            return await _dbContext.Set<T>().SingleOrDefaultAsync(match);
+            return await Entities.SingleOrDefaultAsync(match);
         }
 
         public ICollection<T> FindAll(Expression<Func<T, bool>> match)
         {
-            return _dbContext.Set<T>().Where(match).ToList();
+            return Entities.Where(match).ToList();
         }
 
         public async Task<ICollection<T>> FindAllAsync(Expression<Func<T, bool>> match)
         {
-            return await _dbContext.Set<T>().Where(match).ToListAsync();
+            return await Entities.Where(match).ToListAsync();
         }
       
         public IQueryable<T> FindBy(Expression<Func<T, bool>> predicate)
         {
-            IQueryable<T> query = _dbContext.Set<T>().Where(predicate);
+            IQueryable<T> query = Entities.Where(predicate);
             return query;
         }
 
         public async Task<ICollection<T>> FindByAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _dbContext.Set<T>().Where(predicate).ToListAsync();
+            return await Entities.Where(predicate).ToListAsync();
         }
 
         public ICollection<T> GetAll()
         {
-            if (!_cacheService(cacheTech).TryGet(cacheKey, out ICollection<T> cachedList))
+            var encodedResult = _distributedCache.GetString(cacheKey);
+            if (string.IsNullOrEmpty(encodedResult))
             {
-                cachedList = _dbContext
-                 .Set<T>()
+                var cachedList = Entities
                  .ToList();
-                _cacheService(cacheTech).Set(cacheKey, cachedList);
+                 _distributedCache.SetString(cacheKey, JsonConvert.SerializeObject(cachedList));
+                return cachedList;
             }
-            return cachedList;
+            return JsonConvert.DeserializeObject<ICollection<T>>(encodedResult);
         }
 
         public async Task<ICollection<T>> GetAllAsync()
         {
-            if (!_cacheService(cacheTech).TryGet(cacheKey, out ICollection<T> cachedList))
+            var encodedResult = await _distributedCache.GetStringAsync(cacheKey);
+            if (string.IsNullOrEmpty(encodedResult))
             {
-                cachedList = await _dbContext
-                 .Set<T>()
-                 .ToListAsync();
-                _cacheService(cacheTech).Set(cacheKey, cachedList);
+                var cachedList = await Entities.ToListAsync();
+                await _distributedCache.SetStringAsync(cacheKey,JsonConvert.SerializeObject(cachedList));
+                return cachedList;
             }
-            return cachedList;
+            return JsonConvert.DeserializeObject<ICollection<T>>(encodedResult);
         }
 
         public async Task<ICollection<T>> GetAllIncludingAsync(params Expression<Func<T, object>>[] includeProperties)
         {
-            if (!_cacheService(cacheTech).TryGet(cacheKey, out ICollection<T> cachedList))
+            var encodedResult = await _distributedCache.GetStringAsync(cacheKey);
+            if (string.IsNullOrEmpty(encodedResult))
             {
-                IQueryable<T> queryable = _dbContext.Set<T>();
+                IQueryable<T> queryable = Entities;
                 foreach (Expression<Func<T, object>> includeProperty in includeProperties)
                 {
                     queryable = queryable.Include<T, object>(includeProperty);
                 }
 
-                cachedList = await queryable.ToListAsync();
-                 
-                _cacheService(cacheTech).Set(cacheKey, cachedList);
-            }         
+               var cachedList = await queryable.ToListAsync();
 
-            return cachedList;
+                await _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(cachedList));
+                return cachedList;
+            }
+
+            return JsonConvert.DeserializeObject<ICollection<T>>(encodedResult);
         }
 
         public ICollection<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties)
         {
-            if (!_cacheService(cacheTech).TryGet(cacheKey, out ICollection<T> cachedList))
+            var encodedResult = _distributedCache.GetString(cacheKey);
+            if (string.IsNullOrEmpty(encodedResult))
             {
-                IQueryable<T> queryable = _dbContext.Set<T>();
+                IQueryable<T> queryable = Entities;
                 foreach (Expression<Func<T, object>> includeProperty in includeProperties)
                 {
                     queryable = queryable.Include<T, object>(includeProperty);
                 }
 
-                cachedList =  queryable.ToList();
-
-                _cacheService(cacheTech).Set(cacheKey, cachedList);
+                var cachedList =  queryable.ToList();
+                 _distributedCache.SetString(cacheKey, JsonConvert.SerializeObject(cachedList));
+                return cachedList;
             }
 
-            return cachedList;
+            return JsonConvert.DeserializeObject<ICollection<T>>(encodedResult);
         }
 
         public T GetById(int id)
@@ -178,7 +182,6 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             {
                 _dbContext.Entry(exist).CurrentValues.SetValues(entity);
                 _dbContext.Entry(entity).State = EntityState.Modified;
-                //_cacheService(cacheTech).Remove(cacheKey);
                 BackgroundJob.Enqueue(() => RefreshCache());
             }
             return exist;
@@ -191,7 +194,6 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             {                
                 _dbContext.Entry(exist).CurrentValues.SetValues(entity);
                 _dbContext.Entry(entity).State = EntityState.Modified;
-                //_cacheService(cacheTech).Remove(cacheKey);
                 BackgroundJob.Enqueue(() => RefreshCache());
             }
             return exist;
@@ -206,7 +208,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
 
         public IQueryable<T> QueryInclude(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = "")
         {
-            IQueryable<T> Query = _dbContext.Set<T>();
+            IQueryable<T> Query = Entities;
 
             if (filter != null)
             {
@@ -230,7 +232,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
 
         public async Task<ICollection<T>> GetPagedResponseAsync(int pageNumber, int pageSize, string includeProperties = "")
         {
-            var queryable = _dbContext.Set<T>()
+            var queryable = Entities
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .AsNoTracking()
@@ -249,7 +251,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
 
         public ICollection<T> GetPagedResponse(int pageNumber, int pageSize, string includeProperties = "")
         {
-            var queryable = _dbContext.Set<T>()
+            var queryable = Entities
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .AsNoTracking()

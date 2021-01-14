@@ -9,6 +9,7 @@ namespace AspNetCoreHero.Application.Interfaces.Repositories
 {
     public interface IGenericRepositoryAsync<T> where T : class
     {
+        IQueryable<T> Entities { get; }
         IQueryable<T> QueryInclude(Expression<Func<T, bool>> filter = null,
         Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
         string includeProperties = "");

@@ -4,6 +4,8 @@ using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Domain.Entities;
 using AspNetCoreHero.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,36 +15,37 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
 {
     public class ProductRepositoryAsync : GenericRepositoryAsync<Product>, IProductRepositoryAsync
     {
-        private readonly static CacheTech cacheTech = CacheTech.Memory;
         private readonly string cacheKey = $"{typeof(Product)}";
-        private readonly Func<CacheTech, ICacheService> _cacheService;
-        private readonly DbSet<Product> _products;
+        private readonly IDistributedCache _distributedCache;
 
-        public ProductRepositoryAsync(ApplicationContext dbContext, Func<CacheTech, ICacheService> cacheService) : base(dbContext, cacheService)
+        public ProductRepositoryAsync(ApplicationContext dbContext, IDistributedCache distributedCache) : base(dbContext, distributedCache)
         {
-            _products = dbContext.Set<Product>();
-            _cacheService = cacheService;
+            _distributedCache = distributedCache;
         }
 
         public async Task<IReadOnlyList<Product>> GetAllWithCategoriesAsync(int pageNumber, int pageSize, bool isCached = false)
         {
-            if (!_cacheService(cacheTech).TryGet(cacheKey, out IReadOnlyList<Product> cachedList))
+            var encodedResult = _distributedCache.GetString(cacheKey);
+            if (string.IsNullOrEmpty(encodedResult))
             {
-                var data = _products.Include(a => a.ProductCategory).AsQueryable();
-                cachedList = await data.Skip((pageNumber - 1) * pageSize)
+                var data = Entities.Include(a => a.ProductCategory).AsQueryable();
+                var cachedList = await data.Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .AsNoTracking().ToListAsync();
-                _cacheService(cacheTech).Set(cacheKey, cachedList);
+                await _distributedCache.SetStringAsync(cacheKey,JsonConvert.SerializeObject(cachedList));
+                return cachedList;
             }
-            return cachedList;
+            return JsonConvert.DeserializeObject<IReadOnlyList<Product>>(encodedResult);
         }
 
         public async Task<IReadOnlyList<Product>> GetAllWithCategoriesWithoutImagesAsync(int pageNumber, int pageSize, bool isCached = false)
         {
-            if (!_cacheService(cacheTech).TryGet($"{cacheKey}WithoutImages{pageNumber}{pageSize}", out IReadOnlyList<Product> cachedList))
+            var cacheKeyCustom = $"{cacheKey}WithoutImages{pageNumber}{pageSize}";
+            var encodedResult = _distributedCache.GetString(cacheKeyCustom);
+            if (string.IsNullOrEmpty(encodedResult))
             {
-                var data = _products.Include(a => a.ProductCategory).AsQueryable();
-                cachedList = await data.Skip((pageNumber - 1) * pageSize)
+                var data = Entities.Include(a => a.ProductCategory).AsQueryable();
+                var cachedList = await data.Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .AsNoTracking().Select(a =>
                 new Product
@@ -54,15 +57,16 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
                     ProductCategoryId = a.ProductCategoryId,
                     Price = a.Price,
                     Barcode = a.Barcode
-                }).ToListAsync();
-                _cacheService(cacheTech).Set($"{cacheKey}WithoutImages{pageNumber}{pageSize}", cachedList);
+                }).ToListAsync();             
+                await _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(cachedList));
+                return cachedList;
             }
-            return cachedList;
+            return JsonConvert.DeserializeObject<IReadOnlyList<Product>>(encodedResult);
         }
 
         public Task<bool> IsUniqueBarcodeAsync(string barcode)
         {
-            return _products.AllAsync(p => p.Barcode != barcode);
+            return Entities.AllAsync(p => p.Barcode != barcode);
         }
     }
 }

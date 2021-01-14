@@ -22,19 +22,19 @@ namespace AspNetCoreHero.Infrastructure.Shared.Extensions
 
             // AddCaching
             services.AddSingleton<MemoryCacheService>();
-            services.AddSingleton<RedisCacheService>();
-            services.AddSingleton<Func<CacheTech, ICacheService>>(serviceProvider => key =>
-            {
-                switch (key)
-                {
-                    case CacheTech.Memory:
-                        return serviceProvider.GetService<MemoryCacheService>();
-                    case CacheTech.Redis:
-                        return serviceProvider.GetService<RedisCacheService>();
-                    default:
-                        return serviceProvider.GetService<MemoryCacheService>();
-                }
-            });
+            //services.AddSingleton<RedisCacheService>();
+            //services.AddSingleton<Func<CacheTech, ICacheService>>(serviceProvider => key =>
+            //{
+            //    switch (key)
+            //    {
+            //        case CacheTech.Memory:
+            //            return serviceProvider.GetService<MemoryCacheService>();
+            //        case CacheTech.Redis:
+            //            return serviceProvider.GetService<RedisCacheService>();
+            //        default:
+            //            return serviceProvider.GetService<MemoryCacheService>();
+            //    }
+            //});
         }    
     }
 }

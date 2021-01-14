@@ -7,12 +7,10 @@ using AspNetCoreHero.PublicAPI.Filter;
 using AspNetCoreHero.PublicAPI.Services;
 using Hangfire;
 using Hangfire.Dashboard;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -44,6 +42,14 @@ namespace AspNetCoreHero.PublicAPI
             services.AddHealthChecks();
             //For In-Memory Caching
             services.AddMemoryCache();
+            services.AddDistributedMemoryCache(option => {
+                //new MemoryCacheEntryOptions
+                //{
+                //    AbsoluteExpiration = DateTime.Now.AddHours(1),
+                //    Priority = CacheItemPriority.High,
+                //    SlidingExpiration = TimeSpan.FromMinutes(60)
+                //};
+            });
             services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
 
             //Hangfire
