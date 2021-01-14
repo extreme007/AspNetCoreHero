@@ -1,3 +1,4 @@
+using AspNetCoreHero.Application.DTOs.Settings;
 using AspNetCoreHero.Application.Extensions;
 using AspNetCoreHero.Application.Interfaces.Shared;
 using AspNetCoreHero.Infrastructure.Persistence.Extensions;
@@ -11,10 +12,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using System;
 using System.IO;
 
 namespace AspNetCoreHero.PublicAPI
@@ -42,13 +46,15 @@ namespace AspNetCoreHero.PublicAPI
             services.AddHealthChecks();
             //For In-Memory Caching
             services.AddMemoryCache();
+            var AbsoluteExpiration = _configuration.GetValue<int>("MemoryCacheSettings:AbsoluteExpirationInHours");
+            var SlidingExpirationInMinutes = _configuration.GetValue<int>("MemoryCacheSettings:SlidingExpirationInMinutes");
             services.AddDistributedMemoryCache(option => {
-                //new MemoryCacheEntryOptions
-                //{
-                //    AbsoluteExpiration = DateTime.Now.AddHours(1),
-                //    Priority = CacheItemPriority.High,
-                //    SlidingExpiration = TimeSpan.FromMinutes(60)
-                //};
+                new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpiration = DateTime.Now.AddHours(AbsoluteExpiration),
+                    Priority = CacheItemPriority.High,
+                    SlidingExpiration = TimeSpan.FromMinutes(SlidingExpirationInMinutes),
+                };
             });
             services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
 
