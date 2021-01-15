@@ -19,7 +19,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
+using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
 {
@@ -78,31 +80,40 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Extensions
                        ValidAudience = configuration["JWTSettings:Audience"],
                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTSettings:Key"]))
                    };
-                   //o.Events = new JwtBearerEvents()
-                   //{
-                   //    OnAuthenticationFailed = c =>
-                   //    {
-                   //        c.NoResult();
-                   //        c.Response.StatusCode = 500;
-                   //        c.Response.ContentType = "text/plain";
-                   //        return c.Response.WriteAsync(c.Exception.ToString());
-                   //    },
-                   //    OnChallenge = context =>
-                   //    {
-                   //        context.HandleResponse();
-                   //        context.Response.StatusCode = 401;
-                   //        context.Response.ContentType = "application/json";
-                   //        var result = JsonConvert.SerializeObject(new Response<string>("You are not Authorized"));
-                   //        return context.Response.WriteAsync(result);
-                   //    },
-                   //    OnForbidden = context =>
-                   //    {
-                   //        context.Response.StatusCode = 403;
-                   //        context.Response.ContentType = "application/json";
-                   //        var result = JsonConvert.SerializeObject(new Response<string>("You are not authorized to access this resource"));
-                   //        return context.Response.WriteAsync(result);
-                   //    },
-                   //};
+                   o.Events = new JwtBearerEvents()
+                   {
+                       OnChallenge = context =>
+                       {
+                           context.HandleResponse();
+                           context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                           context.Response.ContentType = "application/json";
+                           var result = JsonConvert.SerializeObject(new Response<string>("You are not Authorized"));
+                           return context.Response.WriteAsync(result);
+                       },
+                       OnForbidden = context =>
+                       {
+                           context.Response.StatusCode = 403;
+                           context.Response.ContentType = "application/json";
+                           var result = JsonConvert.SerializeObject(new Response<string>("You are not authorized to access this resource"));
+                           return context.Response.WriteAsync(result);
+                       },
+                       //OnAuthenticationFailed = context =>
+                       //{
+                       //    //context.NoResult();
+                       //    //context.Response.StatusCode = 500;
+                       //    //context.Response.ContentType = "text/plain";
+                       //    //return context.Response.WriteAsync(context.Exception.ToString());
+                       //    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                       //    context.Response.ContentType = "application/json";
+                       //    var result = JsonConvert.SerializeObject(new Response<string>(context.Exception.Message));
+                       //    return context.Response.WriteAsync(result);
+                       //},
+                       //OnMessageReceived = context =>
+                       //{
+                       //    context.Token = context.Request.Cookies["your-cookie"];
+                       //    return Task.CompletedTask;
+                       //}
+                   };
                });
 
 
