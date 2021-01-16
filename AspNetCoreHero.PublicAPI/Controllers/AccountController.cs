@@ -86,7 +86,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers
             if (string.IsNullOrEmpty(token))
                 return Ok(new Response<string>() { Succeeded = false, Message = "Token is required" });
 
-            var response =await _accountService.RevokeToken(token);
+            var response =await _accountService.RevokeToken(token, IPHelper.GetIpAddress());
 
             if (!response)
                 return Ok(new Response<string>() { Succeeded = false, Message = "Token not found" });

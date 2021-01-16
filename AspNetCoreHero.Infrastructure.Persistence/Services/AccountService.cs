@@ -259,7 +259,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             return new Response<AuthenticationResponse>(response);         
         }
 
-        public async Task<bool> RevokeToken(string accessToken)
+        public async Task<bool> RevokeToken(string accessToken, string ipAddress)
         {
             var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == accessToken));
 
@@ -273,6 +273,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
 
             // revoke token and save
             refreshToken.Revoked = DateTime.UtcNow;
+            refreshToken.RevokedByIp = ipAddress;            
             await _userManager.UpdateAsync(user);
             return true;
         }
