@@ -17,12 +17,12 @@ namespace AspNetCoreHero.PublicAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        private readonly ILogRepository _logService;
+        private readonly ILogRepository _logRepository;
         private readonly IUnitOfWork _unitOfWork;
-        public AccountController(IAccountService accountService,ILogRepository logRepository,IUnitOfWork unitOfWork)
+        public AccountController(IAccountService accountService, ILogRepository logRepository, IUnitOfWork unitOfWork)
         {
             _accountService = accountService;
-            _logService = logRepository;
+            _logRepository = logRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -34,7 +34,7 @@ namespace AspNetCoreHero.PublicAPI.Controllers
             var result = await _accountService.AuthenticateAsync(request, ipAddress);
             SetTokenInCookie(result?.Data?.RefreshToken, result?.Data?.AccessToken);
             //Add auditLog
-            await _logService.AddLogAsync(AuditType.Login.ToString(), result.Data.Id, ipAddress);
+            await _logRepository.AddLogAsync(AuditType.Login.ToString(), result.Data.Id, ipAddress);
             await _unitOfWork.Commit(default);
             return Ok(result);
         }

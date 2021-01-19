@@ -44,12 +44,4 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
             return mappedLogs;
         }
     }
-
-    public class LogProfile : Profile
-    {
-        public LogProfile()
-        {
-            CreateMap<AuditLogResponse, Audit>().ReverseMap();
-        }
-    }
 }

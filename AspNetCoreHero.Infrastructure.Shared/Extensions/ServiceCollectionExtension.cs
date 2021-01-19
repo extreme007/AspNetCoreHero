@@ -16,7 +16,7 @@ namespace AspNetCoreHero.Infrastructure.Shared.Extensions
         public static void AddSharedInfrastructure(this IServiceCollection services, IConfiguration _config)
         {
             services.Configure<MailSettings>(_config.GetSection("MailSettings"));
-            services.Configure<CacheSettings>(_config.GetSection("MemoryCacheSettings"));
+            services.Configure<CacheSettings>(_config.GetSection("CacheSettings"));
             services.AddSingleton<IDateTimeService, DateTimeService>();
             services.AddSingleton<IMailService, MailService>();
 

@@ -46,8 +46,8 @@ namespace AspNetCoreHero.PublicAPI
             services.AddHealthChecks();
             //For In-Memory Caching
             services.AddMemoryCache();
-            var AbsoluteExpiration = _configuration.GetValue<int>("MemoryCacheSettings:AbsoluteExpirationInHours");
-            var SlidingExpirationInMinutes = _configuration.GetValue<int>("MemoryCacheSettings:SlidingExpirationInMinutes");
+            var AbsoluteExpiration = _configuration.GetValue<int>("CacheSettings:AbsoluteExpirationInHours");
+            var SlidingExpirationInMinutes = _configuration.GetValue<int>("CacheSettings:SlidingExpirationInMinutes");
             services.AddDistributedMemoryCache(option => {
                 new MemoryCacheEntryOptions
                 {

@@ -31,17 +31,19 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
         private readonly JWTSettings _jwtSettings;
         private readonly IMailService _mailService;
         private readonly MailSettings _mailSettings;
+        private readonly IDateTimeService _dateTimeService;
         public AccountService(UserManager<ApplicationUser> userManager,
             IOptions<JWTSettings> jwtSettings,
             SignInManager<ApplicationUser> signInManager,
             IMailService mailService,
-            IOptions<MailSettings> mailSettings)
+            IOptions<MailSettings> mailSettings,IDateTimeService dateTimeService)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
             _signInManager = signInManager;
             _mailService = mailService;
             _mailSettings = mailSettings.Value;
+            _dateTimeService = dateTimeService;
         }
 
         public async Task<Response<AuthenticationResponse>> AuthenticateAsync(AuthenticationRequest request, string ipAddress)
@@ -55,6 +57,10 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             if (!result.Succeeded)
             {
                 throw new ApiException($"Invalid Credentials for '{request.Email}'.");
+            }
+            if (!user.IsActive)
+            {
+                throw new ApiException($"Account Not Active");
             }
             //if (!user.EmailConfirmed)
             //{
@@ -151,7 +157,6 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             var _enpointUri = new Uri(string.Concat($"{origin}/", route));
             var verificationUri = QueryHelpers.AddQueryString(_enpointUri.ToString(), "userId", user.Id);
             verificationUri = QueryHelpers.AddQueryString(verificationUri, "code", code);
-            //Email Service Call Here
             return verificationUri;
         }
 
@@ -163,7 +168,6 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             var _enpointUri = new Uri(string.Concat($"{origin}/", route));
             var resetPasswordUri = QueryHelpers.AddQueryString(_enpointUri.ToString(), "email", user.Email);
             resetPasswordUri = QueryHelpers.AddQueryString(resetPasswordUri, "token", code);
-            //Email Service Call Here
             return resetPasswordUri;
         }
 
@@ -185,8 +189,6 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
         public async Task ForgotPassword(ForgotPasswordRequest model, string origin)
         {
             var account = await _userManager.FindByEmailAsync(model.Email);
-
-            // always return ok response to prevent email enumeration
             if (account == null) return;
 
             //var code = await _userManager.GeneratePasswordResetTokenAsync(account);
@@ -237,7 +239,9 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             }
 
             //Revoke Current Refresh Token
-            refreshToken.Revoked = DateTime.UtcNow;
+            //refreshToken.Revoked = DateTime.UtcNow;
+            refreshToken.Revoked = _dateTimeService.NowUtc;
+
 
             //Generate new Refresh Token and save to Database
             var newRefreshToken = TokenHelper.GenerateRefreshToken(ipAddress);
@@ -272,7 +276,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Services
             if (!refreshToken.IsActive) return false;
 
             // revoke token and save
-            refreshToken.Revoked = DateTime.UtcNow;
+            //refreshToken.Revoked = DateTime.UtcNow;
+            refreshToken.Revoked = _dateTimeService.NowUtc;
             refreshToken.RevokedByIp = ipAddress;            
             await _userManager.UpdateAsync(user);
             return true;
