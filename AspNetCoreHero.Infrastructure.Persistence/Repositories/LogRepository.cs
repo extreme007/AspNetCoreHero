@@ -40,7 +40,7 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Repositories
         public async Task<List<AuditLogResponse>> GetAuditLogsAsync(string userId)
         {
             var logs = await _repository.FindAllAsync(a => a.UserId == userId);
-            var mappedLogs = _mapper.Map<List<AuditLogResponse>>(logs);
+            var mappedLogs = _mapper.Map<List<AuditLogResponse>>(logs.OrderByDescending(x=>x.Id).Take(250));
             return mappedLogs;
         }
     }
