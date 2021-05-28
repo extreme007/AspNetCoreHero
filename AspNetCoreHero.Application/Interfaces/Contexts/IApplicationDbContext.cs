@@ -21,5 +21,7 @@ namespace AspNetCoreHero.Application.Interfaces.Contexts
 
         DbSet<Product> Products { get; set; }
         DbSet<ProductCategory> ProductCategory { get; set; }
+        DbSet<Article> Articles { get; set; }
+        DbSet<ArticleCategory> ArticleCategory { get; set; }
     }
 }
