@@ -26,12 +26,12 @@ namespace AspNetCoreHero.Infrastructure.Shared.Services
                 };
             }
         }
-        public bool TryGet<T>(string cacheKey, out T value)
-        {
-            _memoryCache.TryGetValue(cacheKey, out value);
-            if (value == null) return false;
-            else return true;
-        }
+        //public bool TryGet<T>(string cacheKey, out T value)
+        //{
+        //    _memoryCache.TryGetValue(cacheKey, out value);
+        //    if (value == null) return false;
+        //    else return true;
+        //}
 
         public T Set<T>(string cacheKey, T value)
         {
@@ -41,6 +41,11 @@ namespace AspNetCoreHero.Infrastructure.Shared.Services
         public void Remove(string cacheKey)
         {
             _memoryCache.Remove(cacheKey);
+        }
+
+        public T Get<T>(string key)
+        {
+            return _memoryCache.Get<T>(key);           
         }
     }
 }

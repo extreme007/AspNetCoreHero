@@ -20,9 +20,10 @@ namespace AspNetCoreHero.Infrastructure.Shared.Extensions
             services.AddSingleton<IDateTimeService, DateTimeService>();
             services.AddSingleton<IMailService, MailService>();
 
-            // AddCaching
-            services.AddSingleton<MemoryCacheService>();
+            //// AddCaching
+            //services.AddSingleton<MemoryCacheService>();
             //services.AddSingleton<RedisCacheService>();
+
             //services.AddSingleton<Func<CacheTech, ICacheService>>(serviceProvider => key =>
             //{
             //    switch (key)

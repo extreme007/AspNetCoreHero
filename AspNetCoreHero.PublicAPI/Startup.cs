@@ -45,17 +45,22 @@ namespace AspNetCoreHero.PublicAPI
             services.AddHttpContextAccessor();
             services.AddHealthChecks();
             //For In-Memory Caching
-            services.AddMemoryCache();
-            var AbsoluteExpiration = _configuration.GetValue<int>("CacheSettings:AbsoluteExpirationInHours");
-            var SlidingExpirationInMinutes = _configuration.GetValue<int>("CacheSettings:SlidingExpirationInMinutes");
-            services.AddDistributedMemoryCache(option => {
-                new MemoryCacheEntryOptions
-                {
-                    AbsoluteExpiration = DateTime.Now.AddHours(AbsoluteExpiration),
-                    Priority = CacheItemPriority.High,
-                    SlidingExpiration = TimeSpan.FromMinutes(SlidingExpirationInMinutes),
-                };
+            //var AbsoluteExpiration = _configuration.GetValue<int>("CacheSettings:AbsoluteExpirationInHours");
+            //var SlidingExpirationInMinutes = _configuration.GetValue<int>("CacheSettings:SlidingExpirationInMinutes");
+            //services.AddDistributedMemoryCache(option => {
+            //    new MemoryCacheEntryOptions
+            //    {
+            //        AbsoluteExpiration = DateTime.Now.AddHours(AbsoluteExpiration),
+            //        Priority = CacheItemPriority.High,
+            //        SlidingExpiration = TimeSpan.FromMinutes(SlidingExpirationInMinutes),
+            //    };
+            //});
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = _configuration.GetSection("Redis")["ConnectionString"];
             });
+
             services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
 
             //Hangfire
