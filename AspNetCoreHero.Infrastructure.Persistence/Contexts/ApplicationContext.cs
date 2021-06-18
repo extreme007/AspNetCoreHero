@@ -30,6 +30,8 @@ namespace AspNetCoreHero.Infrastructure.Persistence.Contexts
 
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductCategory> ProductCategory { get; set; }
+        public DbSet<Article> Articles { get; set; }
+        public DbSet<ArticleCategory> ArticleCategory { get; set; }
         public bool HasChanges => ChangeTracker.HasChanges();
 
         public IDbConnection Connection => Database.GetDbConnection();
